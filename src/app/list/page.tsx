@@ -3,6 +3,7 @@ import ProductList from "@/components/ProductList"
 import Image from "next/image"
 
 const ListPage = () => {
+  
   return (
     <div className='px-4 md:px-8 lg:px-16 xl:32 2xl:px-64 relative'>
       <div className=" hidden sm:flex bg-pink-50 p-4 flex justify-between h-64">
