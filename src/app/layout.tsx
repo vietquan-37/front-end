@@ -1,15 +1,12 @@
-import type { Metadata } from "next";
+// layout.tsx (Server Component with client-side logic separated)
+
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import Providers from "@/components/Providers"; // Adjust the path if necessary
+import ConditionalNavbar from "@/components/ConditionalNavbar"; // Use the new ConditionalNavbar component
 
 const inter = Inter({ subsets: ["latin"] });
-
-export const metadata: Metadata = {
-  title: "Lama Dev E-Commerce Application",
-  description: "A complete e-commerce application with Next.js and Wix",
-};
 
 export default function RootLayout({
   children,
@@ -18,10 +15,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-        <Navbar />
-        {children}
-        <Footer />
+      <body suppressHydrationWarning={true} className={inter.className}>
+        <Providers>
+          <ConditionalNavbar /> {/* Conditionally renders the Navbar */}
+          {children}
+          <Footer />
+        </Providers>
       </body>
     </html>
   );
