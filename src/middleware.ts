@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 
 
 
-const role = ["ADMIN", "USER"];
+const role = ["Admin", "Customer"];
 
 export default withAuth(
   function middleware(req) {
@@ -15,7 +15,7 @@ export default withAuth(
 
     if (
       req.nextUrl.pathname.startsWith("/admin") &&
-      req.nextauth.token.role === "ADMIN"
+      req.nextauth.token.role === "Admin"
     ) {
       return NextResponse.next();
     }

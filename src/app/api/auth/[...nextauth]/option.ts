@@ -1,7 +1,5 @@
-
 import { http } from "@/utils/config";
 import { AuthOptions } from "next-auth";
-
 import CredentialsProvider from "next-auth/providers/credentials";
 
 export const authOptions: AuthOptions = {
@@ -10,14 +8,8 @@ export const authOptions: AuthOptions = {
             id: "credentials",
             name: "sign in",
             credentials: {
-                username: {
-                    label: "username",
-                    type: "text",
-                },
-                password: {
-                    label: "password",
-                    type: "password",
-                },
+                username: { label: "username", type: "text" },
+                password: { label: "password", type: "password" },
             },
             async authorize(credentials, request) {
                 try {
@@ -25,56 +17,47 @@ export const authOptions: AuthOptions = {
                         username: credentials?.username as string,
                         password: credentials?.password as string,
                     });
-
-                    // console.log(response.data);
-
-                    const user = response.data;
-                    if (user.status === 200 && user) {
-                        // console.log(user);
-
-                        // console.log('return data user 200: ', user);
-
-                        return user;
+                    const user = response?.data;
+                    if (user?.success === true && user?.token) {
+                        return user; // Trả về object user nếu thành công
+                    } else {
+                        console.log("Error: Invalid response format", user);
                     }
                 } catch (error) {
-                    console.log(error);
+                    console.log("Error in authorize:", error);
                 }
-                return null;
-            },
+                return null; // Trả về null nếu có lỗi
+            }
         }),
     ],
     session: {
         strategy: "jwt",
-        maxAge: 1 * 60 * 60,
+        maxAge: 1 * 60 * 60, // Thời gian sống của token là 1 giờ
     },
     callbacks: {
         signIn: async ({ user, account, profile }) => {
-            if (account?.provider === "credentials") {
-                // console.log('login credentials', account?.provider);
-
-                return true;
+            if (account?.provider === "credentials" && user) {
+                return true; // Đăng nhập thành công
             }
-            return false;
+            return false; // Đăng nhập thất bại
         },
         jwt: async ({ token, user }) => {
             if (user) {
-                token.access_token = user?.data.accessToken;
-
-                token.role = user.data?.role;
+                token.token = user.token; // Lưu token từ user vào token object
+                token.role = user.role; // Lưu role từ user vào token object
             }
             return token;
         },
-
-        session: async ({ session, token, user }) => {
-            session.user.access = token.access_token as string;
-
-            session.user.role = token.role as string;
+        session: async ({ session, token }) => {
+            session.user = {
+                ...session.user,
+                token: token.token as string, // Gán token vào session
+                role: token.role as string,   // Gán role vào session
+            };
             return session;
         },
     },
     pages: {
-        signIn: "/login",
-        // newUser: "/auth/register",
+        signIn: "/login", // Trang đăng nhập
     },
-    // secret: process.env.NEXTAUTH_SECRET,
 };

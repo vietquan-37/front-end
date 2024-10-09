@@ -13,7 +13,7 @@ const LoginPage = () => {
   const { data: session } = useSession(); // Extract user session data
 
   const [saveReq, setSaveReq] = useState<SignInResponse | undefined>();
-  const [email, setEmail] = useState("");
+  const [username, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -26,7 +26,7 @@ const LoginPage = () => {
 
     try {
       const res = await signIn("credentials", {
-        username: email,
+        username: username,
         password: password,
         redirect: false,
       });
@@ -42,11 +42,11 @@ const LoginPage = () => {
       const user = session?.user;
       if (!saveReq?.error) {
         let flag = false;
-        if (user?.role === "ADMIN") {
+        if (user?.role === "Admin") {
           flag = true;
           router.push(ADMIN_PATH);
         }
-        if (user?.role === "USER") {
+        if (user?.role === "Customer") {
           flag = true;
           router.push(USER_PATH);
         }
@@ -67,10 +67,10 @@ const LoginPage = () => {
           <label className="text-sm text-gray-700">E-mail</label>
           <input
          
-            name="email"
+            name="username"
             placeholder="john@gmail.com"
             className="ring-2 ring-gray-300 rounded-md p-4"
-            value={email}
+            value={username}
             onChange={(e) => setEmail(e.target.value)}
           />
         </div>
@@ -92,7 +92,7 @@ const LoginPage = () => {
         <button
           className="bg-quan text-white p-2 rounded-md disabled:bg-pink-200 disabled:cursor-not-allowed"
        
-          disabled={isLoading || !email || !password}
+          disabled={isLoading || !username || !password}
           type="submit"
         >
           {isLoading ? "Logging in..." : "Login"}
