@@ -20,7 +20,7 @@ export const http = axios.create({
 http.interceptors.request.use(
   async (config) => {
     const session = await getServerSession(authOptions);
-    const bearerToken = session?.user?.access as string;
+    const bearerToken = session?.user?.token as string;
     config.headers.Authorization = `Bearer ${bearerToken}`;
     console.log("have set bearer: ", config);
     return config;

@@ -22,7 +22,7 @@ const UseAxiosAuth = () => {
       async (config) => {
         const sessionUse = await getSession();
         if (!config.headers.Authorization) {
-          config.headers.Authorization = `Bearer ${sessionUse?.user?.access as string}`;
+          config.headers.Authorization = `Bearer ${sessionUse?.user?.token as string}`;
         }
         return config;
       },
