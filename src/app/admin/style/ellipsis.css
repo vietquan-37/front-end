@@ -1,0 +1,6 @@
+.ellipsis {
+    white-space: nowrap; /* Ngăn cách dòng */
+    overflow: hidden;    /* Ẩn phần thừa */
+    text-overflow: ellipsis; /* Thêm dấu ba chấm */
+  }
+  
