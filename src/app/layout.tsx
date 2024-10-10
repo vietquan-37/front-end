@@ -5,6 +5,7 @@ import "./globals.css";
 import Footer from "@/components/Footer";
 import Providers from "@/components/Providers"; // Adjust the path if necessary
 import ConditionalNavbar from "@/components/ConditionalNavbar"; // Use the new ConditionalNavbar component
+import ConditionalFooter from "@/components/ConditionalFooter"; // Import the ConditionalFooter component
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,7 +20,7 @@ export default function RootLayout({
         <Providers>
           <ConditionalNavbar /> {/* Conditionally renders the Navbar */}
           {children}
-          <Footer />
+          <ConditionalFooter /> {/* Conditionally renders the Footer */}
         </Providers>
       </body>
     </html>
