@@ -2,7 +2,8 @@
 import Layout from "@/app/admin/layoutAdmin";
 import "@/app/admin/style/ellipsis.css";
 import React, { useEffect, useState } from "react";
-
+import Modal from "@/app/admin/products/Modal";
+import ImageModal from "@/app/admin/products/ViewImage"; // Import modal mới
 interface Product {
   id: number;
   "name-product": string;
@@ -12,8 +13,22 @@ interface Product {
   quantity: number;
   "category-id": number;
   size: number;
-  imageUrls:string[] | null;
+  "image-urls":string[] | null;
 }
+// Hard-code danh sách tên danh mục dựa trên ID
+const categoryNames: { [key: number]: string } = {
+  1: "Asagi",
+  2: "Goshiki",
+  3: "Kohaku",
+  4: "Shusui",
+  5: "Koromo",
+  6: "Bekko",
+  7: "Doitsu",
+  8: "Tancho",
+  9: "Ginrin",
+  10: "Showa",
+};
+
 export default function Products() 
 {
   const [products, setProducts] = useState<Product[]>([]);
@@ -22,6 +37,11 @@ export default function Products()
   const [totalPages, setTotalPages] = useState(0);
   const [pageSize, setPageSize] = useState(5);
   const [sort, setSort] = useState(""); // Default sort
+  const [showModal, setShowModal] = useState(false);
+  // Bổ sung state để quản lý modal hình ảnh
+const [showImageModal, setShowImageModal] = useState(false);
+const [selectedImages, setSelectedImages] = useState<string[]>([]); // Danh sách ảnh đã chọn
+
   //API cGetAllProductAdmin
 const fetchProducts = async (page = 1, size = pageSize, searchTerm = "", sort = "") => {
   try {
@@ -68,14 +88,39 @@ const fetchProducts = async (page = 1, size = pageSize, searchTerm = "", sort = 
       break;
   }
 };
-// method imageUrls
-const getRandomImage = (imageUrls: string[] | null): string | undefined => {
+// Thêm hàm để mở modal với hình ảnh của sản phẩm
+const handleViewImages = (imageUrls: string[] | null) => {
+  if (imageUrls) {
+    setSelectedImages(imageUrls); // Lưu ảnh đã chọn
+  } else {
+    setSelectedImages([]);
+  }
+  setShowImageModal(true); // Mở modal
+};
+
+
+
+const handleAddProduct = (newProduct: any) => {
+  // Gửi request thêm sản phẩm mới vào API ở đây
+
+  console.log("New Product:", newProduct);
+  // fetchProducts(currentPage, pageSize, searchTerm, sort); // Cập nhật danh sách sản phẩm
+};
+// Function to get a random image from an array of image URLs
+const getRandomImage = (imageUrls: string | any[] | null) => {
   if (imageUrls && imageUrls.length > 0) {
     const randomIndex = Math.floor(Math.random() * imageUrls.length);
-    return imageUrls[randomIndex];
+    const selectedImage = imageUrls[randomIndex];
+    return selectedImage;
+  } else {
+    return "no image";
   }
-  return undefined; // undefined
 };
+// Hàm định dạng giá trị VND
+const formatCurrency = (amount: number) => {
+  return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + " VND";
+};
+
 
 return (
   <Layout>
@@ -91,7 +136,6 @@ return (
           onChange={(e) => setSearchTerm(e.target.value)}
           className="border p-2 rounded w-full md:w-1/5 mr-0 md:mr-4 mb-2 md:mb-0"
         />
-
         <select
           onChange={(e) => handleFilterChange(e.target.value)}
           className="border p-2 rounded w-full md:w-1/6"
@@ -101,7 +145,11 @@ return (
           <option value="price">OrderBy Price</option>
           <option value="quantity">OrderBy Quantity</option>
         </select>
+        <button
+          className="create button"
+        onClick={() => setShowModal(true)}>Create New Product</button>
       </div>
+
       {/* Tiêu đề */}
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-10 gap-4 font-semibold mb-4">
         <span>ID</span>
@@ -113,62 +161,60 @@ return (
         <span>Category</span>
         <span>Size</span>
         <span>Images</span>
+        <span>Actions</span>
       </div>
 
       {/* Danh sách sản phẩm */}
       <ul className="bg-white rounded-lg shadow-md">
         {products.length > 0 ? (
-          products.map((product) => (
-            <li
-              key={product.id}
-              className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4 p-4 border-b hover:bg-gray-100 transition duration-300"
-            >
-              <span>{product.id}</span>
-              <span className="ellipsis">{product["name-product"]}</span>
-              <span className="ellipsis">
+          products.map((product) => {
+            const randomImage = getRandomImage(product["image-urls"]);
+            return (
+              <li
+                key={product.id}
+                className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-10 gap-4 p-4 border-b hover:bg-gray-100 transition duration-300"
+              >
+                <span>{product.id}</span>
+                <span className="ellipsis">{product["name-product"]}</span>
+                <span className="ellipsis">
                   {product.dob ? new Date(product.dob).toLocaleDateString() : "N/A"}
-              </span>
-              <span className="ellipsis">{product["description-product"]}</span>
-              <span className="ellipsis">{product.price}</span>
-              <span className="ellipsis">{product.quantity || "N/A"}</span>
-              <span className="ellipsis">{product["category-id"]}</span>
-              <span className="ellipsis">{product.size}</span>
-               {/* Hiển thị một ảnh ngẫu nhiên */}
-               <span className="ellipsis">
-                  {getRandomImage(product.imageUrls) ? (
-                    <img
-                      src={getRandomImage(product.imageUrls)}
-                      alt={product["name-product"]}
-                      className="w-16 h-16 object-cover"
-                    />
-                  ) : (
-                    "No Image"
-                  )}
                 </span>
-                 {/* Thêm nút Details, Update, Delete */}
-        <span className="flex space-x-2">
-          <button
-            className="bg-blue-500 text-white px-2 py-1 rounded"
-            onClick={() => alert(`Details for ${product["name-product"]}`)} // Thay thế bằng logic chi tiết
-          >
-            Details
-          </button>
-          <button
-            className="bg-yellow-500 text-white px-2 py-1 rounded"
-            onClick={() => alert(`Update ${product["name-product"]}`)} // Thay thế bằng logic cập nhật
-          >
-            Update
-          </button>
-          <button
-            className="bg-red-500 text-white px-2 py-1 rounded"
-            onClick={() => alert(`Delete ${product["name-product"]}`)} // Thay thế bằng logic xóa
-          >
-            Delete
-          </button>
-        </span>    
-              {/* <span className="ellipsis">{product.status === "available" ? "Available" : "Out of Stock"}</span> */}
-            </li>
-          ))
+                <span className="ellipsis">{product["description-product"] || "Chưa có mô tả"}</span>
+                <span className="ellipsis">{formatCurrency(product.price)}</span>
+                <span className="ellipsis">{product.quantity || "N/A"}</span>
+                <span className="ellipsis">{categoryNames[product["category-id"]] || "N/A"}</span>
+                <span className="ellipsis">{product.size} cm</span>
+
+                <span className="flex justify-center">
+                <button className="view button" onClick={() => handleViewImages(product["image-urls"])}>
+                  View Image
+                </button>
+              </span>
+
+                {/* Thêm nút Details, Update, Delete */}
+                <span className="flex justify-center space-x-2">
+                  <button
+                    className="details button"
+                    onClick={() => alert(`Details for ${product["name-product"]}`)}
+                  >
+                    Details
+                  </button>
+                  <button
+                    className="update button"
+                    onClick={() => alert(`Update ${product["name-product"]}`)}
+                  >
+                    Update
+                  </button>
+                  <button
+                    className="delete button"
+                    onClick={() => alert(`Delete ${product["name-product"]}`)}
+                  >
+                    Delete
+                  </button>
+                </span>
+              </li>
+            );
+          })
         ) : (
           <li className="p-4 text-gray-600">Không có sản phẩm nào phù hợp.</li>
         )}
@@ -189,6 +235,17 @@ return (
         ))}
       </div>
     </div>
+    <ImageModal 
+        show={showImageModal}
+        onClose={() => setShowImageModal(false)}
+        images={selectedImages}
+      />
+    {/* Hiển thị modal */}
+    <Modal 
+        show={showModal}
+        onClose={() => setShowModal(false)}
+        onSubmit={handleAddProduct}
+      />
   </Layout>
 );
 }

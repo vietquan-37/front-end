@@ -3,6 +3,8 @@
 import Layout from "@/app/admin/layoutAdmin";
 import React, { useEffect, useState } from "react";
 import "@/app/admin/style/ellipsis.css"; // Đảm bảo đường dẫn chính xác
+import { useRouter } from 'next/navigation'; // Import useRouter
+
 interface User {
   id: number;
   "full-name": string;
@@ -14,32 +16,83 @@ interface User {
 }
 
 export default function Users() {
+  const router = useRouter(); // Khởi tạo router
   const [users, setUsers] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [pageSize, setPageSize] = useState(5);
   const [sort, setSort] = useState(""); // Default sort
+  const [error, setError] = useState<string | null>(null); // State for error handling
+
   // Hàm lấy danh sách người dùng từ API
   const fetchUsers = async (page = 1, size = pageSize, searchTerm = "", sort = "") => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      router.push('/login'); // Điều hướng về trang đăng nhập nếu không có token
+      return;
+    }
     try {
            // Khởi tạo URL
-           const url = new URL(`${process.env.NEXT_PUBLIC_API}/api/user`);
+           const url = new URL(`${process.env.NEXT_PUBLIC_API}/api/admin`);
            url.searchParams.append("page", String(page));
            url.searchParams.append("pageSize", String(size));
      
            // Thêm searchTerm và sort chỉ khi chúng có giá trị
            if (searchTerm) url.searchParams.append("search", searchTerm);
            if (sort) url.searchParams.append("sort", sort);
-     
-           const response = await fetch(url.toString());
-           const data = await response.json();
+    
+            const response = await fetch(url.toString(), {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`, // Thêm token vào header
+        'Content-Type': 'application/json', // Đảm bảo Content-Type đúng
+      },
+    });
+
+    // Kiểm tra trạng thái phản hồi
+    if (response.status === 401) {
+      localStorage.removeItem('token'); // Xóa token
+      router.push('/login'); // Điều hướng đến trang đăng nhập
+      return; // Ngừng thực hiện nếu không có quyền
+    }
+    if (!response.ok) {
+      throw new Error(`Error: ${response.status} ${response.statusText}`);
+    }
+      const data = await response.json();
       setUsers(data.data["list-data"]);
       setTotalPages(data.data["total-page"]);
     } catch (error) {
       console.error("Error fetching users:", error);
+      setError("Không thể tải danh sách người dùng. Vui lòng thử lại."); // Set error message
     }
   };
+
+ // Hàm xử lý sự kiện đăng nhập
+ const handleLogin = async (credentials: any) => {
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API}/api/authentication/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(credentials),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      // Lưu token vào localStorage
+      localStorage.setItem('token', data.token);
+      // Gọi lại fetchUsers sau khi đăng nhập thành công
+      fetchUsers(currentPage, pageSize, searchTerm, sort);
+    } else {
+      console.error("Login failed");
+    }
+  } catch (error) {
+    console.error("Error during login:", error);
+  }
+};
+
  // Gọi fetchUsers để lấy dữ liệu người dùng mặc định khi component khởi động
  useEffect(() => {
   fetchUsers(currentPage, pageSize, "", ""); // Gọi mà không có searchTerm và sort
@@ -98,6 +151,7 @@ useEffect(() => {
           <span>Phone</span>
           <span>Status</span>
           <span>Role</span>
+          <span>Action</span>
         </div>
 
        
@@ -116,6 +170,12 @@ useEffect(() => {
                 <span className="ellipsis">{user["telephone-number"]}</span>
                 <span className="ellipsis">{user.status = 1 ? "Active" : "Inactive"}</span>
                 <span className="ellipsis">{user["role-name"] || "N/A"}</span>
+                {/* Nút hành động */}
+              <div className="flex justify-center space-x-2">
+                <button className="bg-yellow-500 text-white px-2 py-1 rounded">Edit</button>
+                <button className="bg-red-500 text-white px-2 py-1 rounded">Delete</button>
+                <button className="bg-blue-500 text-white px-2 py-1 rounded">View</button>
+              </div>
               </li>
             ))
           ) : (

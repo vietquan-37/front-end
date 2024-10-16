@@ -11,7 +11,6 @@ import {
 const LoginPage = () => {
   const router = useRouter();
   const { data: session } = useSession(); // Extract user session data
-
   const [saveReq, setSaveReq] = useState<SignInResponse | undefined>();
   const [username, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -29,34 +28,55 @@ const LoginPage = () => {
         username: username,
         password: password,
         redirect: false,
+      });   
+       // Kiểm tra phản hồi
+    if (res?.error) {
+      setError("Đăng nhập không thành công.");
+    } else {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API}/api/authentication/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
       });
 
-      setSaveReq(res);
-    } catch (error: any) {
-      setError(error?.message);
+      if (response.ok) {
+        const data = await response.json();
+        const token = data.token; // Lấy token từ phản hồi
+
+        if (token) {
+          localStorage.setItem('token', token); // Lưu token vào localStorage
+          // Kiểm tra role trước khi điều hướng
+          const userRole = data.role; // Giả sử bạn lấy role từ phản hồi
+          if (userRole === "Admin") {
+            router.push(ADMIN_PATH); // Điều hướng đến trang admin
+          } else if (userRole === "Customer") {
+            router.push(USER_PATH); // Điều hướng đến trang user
+          } else {
+            setError("Undefined role");
+          }
+        }
+      } else {
+        setError("Đăng nhập không thành công.");
+      }
     }
+  } catch (error: any) {
+    setError(error?.message);
+  }
   };
 
   useEffect(() => {
-    if (saveReq) {
-      const user = session?.user;
-      if (!saveReq?.error) {
-        let flag = false;
+      // Chỉ điều hướng nếu có session đã đăng nhập
+      if (session) {
+        const user = session.user; // Lấy thông tin từ session sau khi đăng nhập
         if (user?.role === "Admin") {
-          flag = true;
           router.push(ADMIN_PATH);
-        }
-        if (user?.role === "Customer") {
-          flag = true;
+        } else if (user?.role === "Customer") {
           router.push(USER_PATH);
         }
-        if (!flag) setError("Undefined role");
-      } else {
-        setIsLoading(false);
-        setError(saveReq.error);
       }
-    }
-  }, [saveReq, router, session]);
+  }, [router, session]);
 
   return (
     <div className="h-[calc(100vh-80px)] px-4 md:px-8 lg:px-16 xl:px-32 2xl:px-64 flex items-center justify-center">
