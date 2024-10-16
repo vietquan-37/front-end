@@ -1,0 +1,78 @@
+.modal-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* Đặt nội dung ở phía trên */
+  align-items: center;
+  width: 70%; /* Thay đổi kích thước modal */
+  max-width: 500px; /* Kích thước tối đa */
+  height: 80%; /* Chiều cao tối đa của modal */
+  max-height: 600px; /* Chiều cao tối đa */
+  padding: 20px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  overflow-y: auto; /* Thêm cuộn dọc nếu nội dung vượt quá chiều cao */
+}
+
+.modal-header {
+  font-size: 1.5rem;
+  margin-bottom: 10px; /* Thay đổi khoảng cách */
+  text-align: center;
+}
+
+.modal-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px; /* Thay đổi khoảng cách */
+  width: 100%;
+}
+
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 2 cột */
+  gap: 20px; /* Thay đổi khoảng cách */
+  width: 100%;
+}
+
+.image-item {
+  position: relative;
+  width: 100%;
+  padding-top: 150%; /* Thay đổi tỷ lệ để ảnh không quá lớn (3:4) */
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid #ddd;
+}
+
+.image-item img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Giữ nguyên tỷ lệ và cắt bớt nếu cần */
+}
+
+.upload-button {
+  background-color: #007bff;
+  color: white;
+  padding: 8px 16px; /* Thay đổi kích thước nút */
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.upload-button:hover {
+  background-color: #0056b3;
+}
+
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: transparent;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+}

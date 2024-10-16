@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 interface ModalProps {
   show: boolean;
   onClose: () => void;
-  onSubmit: (newProductId: number) => void; // Cập nhật để nhận ID sản phẩm mới
+  onSubmit: (newProductId: any) => void; // Cập nhật để nhận ID sản phẩm mới
 }
 // Hard-code danh sách tên danh mục dựa trên ID
 const categoryNames: { [key: number]: string } = {
@@ -19,36 +19,61 @@ const categoryNames: { [key: number]: string } = {
     9: "Ginrin",
     10: "Showa",
   };
+  
 const Modal: React.FC<ModalProps> = ({ show, onClose, onSubmit }) => {
   const [newProduct, setNewProduct] = useState({
     namekoi: '',
     descriptionkoi: '',
-    price: 0,
-    quantity: 0,
-    size: 0,
+    price: '',
+    quantity: '',
+    size: '',
     dob: new Date().toISOString().split('T')[0], // Ngày sinh mặc định là hôm nay
     categoryid: 1,
   });
 
+  const [errorMessage, setErrorMessage] = useState(''); // State để quản lý thông báo lỗi
+
   const handleSubmit = async () => {
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API}/api/koi`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newProduct),
-      });
-
-      if (!response.ok) throw new Error("Failed to create product");
-
-      const data = await response.json();
-      onSubmit(data.id); // Gọi onSubmit với ID của sản phẩm mới tạo
-      onClose(); // Đóng modal sau khi gửi
-    } catch (error) {
-      console.error("Error adding new product:", error);
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API}/api/koi`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json', 
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      },
+      body: JSON.stringify(newProduct),
+    });
+    const text = await response.text(); // Get response as text first
+    console.log('Response Text:', text); // In ra phản hồi từ server
+    const responseData = text ? JSON.parse(text) : {}; // Parse only if text exists
+    console.log('HTTP Status:', response.status); // Ghi lại mã trạng thái
+    console.log('Response Data:', responseData); // Ghi lại nội dung phản hồi
+ // Kiểm tra mã trạng thái phản hồi
+ if (!response.ok) {
+  alert(responseData.message || "An error occurred while creating the product.");
+      return; // Thoát ra nếu có lỗi
+  }
+  // Handle the parsed response
+  if (responseData.success) {
+    alert(responseData.message); // Hiển thị thông báo thành công
+      onSubmit(responseData.data); // Gọi onSubmit với ID sản phẩm mới
+      setErrorMessage(''); // Xóa bất kỳ thông báo lỗi nào
+  } else {
+    alert(responseData.message || "An unknown error occurred."); // Hiển thị thông báo lỗi
     }
-  };
+    onClose(); // Close modal after submission
+  }  
+  catch (error) {
+    console.error("Error adding new product:", error);
+
+    // Kiểm tra kiểu lỗi
+    if (error instanceof Error) {
+      setErrorMessage(error.message); // Nếu là Error, lấy thông điệp
+    } else {
+      setErrorMessage("An unknown error occurred"); // Nếu không phải Error, thông báo lỗi chung
+    }
+  }
+};
   return (
     show ? (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
@@ -71,23 +96,30 @@ const Modal: React.FC<ModalProps> = ({ show, onClose, onSubmit }) => {
           <input
             type="number"
             placeholder="Price"
-            value={newProduct.price}
-            onChange={(e) => setNewProduct({ ...newProduct, price: +e.target.value })}
+            value={newProduct.price}            
+            onChange={(e) => {
+              const value = e.target.value === '' ? '' : e.target.value; // Nếu rỗng, xử lý là chuỗi rỗng
+              setNewProduct({ ...newProduct, price: value });
+            }}            
             className="border p-2 w-full mb-2"
           />
           <input
             type="number"
             placeholder="Quantity"
             value={newProduct.quantity}
-            onChange={(e) => setNewProduct({ ...newProduct, quantity: +e.target.value })}
-            className="border p-2 w-full mb-2"
+            onChange={(e) => {
+              const value = e.target.value === '' ? '' : e.target.value; // Nếu rỗng, xử lý là chuỗi rỗng
+              setNewProduct({ ...newProduct, quantity: value });
+            }}              className="border p-2 w-full mb-2"
           />
           <input
             type="number"
             placeholder="Size"
             value={newProduct.size}
-            onChange={(e) => setNewProduct({ ...newProduct, size: +e.target.value })}
-            className="border p-2 w-full mb-2"
+            onChange={(e) => {
+              const value = e.target.value === '' ? '' : e.target.value; // Nếu rỗng, xử lý là chuỗi rỗng
+              setNewProduct({ ...newProduct, size: value });
+            }}              className="border p-2 w-full mb-2"
           />
           <input
             type="date"

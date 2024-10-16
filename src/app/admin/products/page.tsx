@@ -3,7 +3,7 @@ import Layout from "@/app/admin/layoutAdmin";
 import "@/app/admin/style/ellipsis.css";
 import React, { useEffect, useState } from "react";
 import Modal from "@/app/admin/products/Modal";
-import ImageModal from "@/app/admin/products/ViewImage"; // Import modal mới
+import ImageModal  from "@/app/admin/products/ViewImage"; // Import modal mới
 interface Product {
   id: number;
   "name-product": string;
@@ -41,6 +41,7 @@ export default function Products()
   // Bổ sung state để quản lý modal hình ảnh
 const [showImageModal, setShowImageModal] = useState(false);
 const [selectedImages, setSelectedImages] = useState<string[]>([]); // Danh sách ảnh đã chọn
+const [selectedKoiId, setSelectedKoiId] = useState<number | null>(null); // Khai báo state cho koiId
 
   //API cGetAllProductAdmin
 const fetchProducts = async (page = 1, size = pageSize, searchTerm = "", sort = "") => {
@@ -89,14 +90,12 @@ const fetchProducts = async (page = 1, size = pageSize, searchTerm = "", sort = 
   }
 };
 // Thêm hàm để mở modal với hình ảnh của sản phẩm
-const handleViewImages = (imageUrls: string[] | null) => {
-  if (imageUrls) {
-    setSelectedImages(imageUrls); // Lưu ảnh đã chọn
-  } else {
-    setSelectedImages([]);
-  }
-  setShowImageModal(true); // Mở modal
+const handleViewImages = (imageUrls: string[] | null, koiId: number) => {
+  setSelectedImages(imageUrls || []);
+  setSelectedKoiId(koiId); // Lưu koiId để upload ảnh cho đúng sản phẩm
+  setShowImageModal(true);
 };
+
 
 
 
@@ -184,11 +183,11 @@ return (
                 <span className="ellipsis">{product.quantity || "N/A"}</span>
                 <span className="ellipsis">{categoryNames[product["category-id"]] || "N/A"}</span>
                 <span className="ellipsis">{product.size} cm</span>
-
                 <span className="flex justify-center">
-                <button className="view button" onClick={() => handleViewImages(product["image-urls"])}>
-                  View Image
-                </button>
+                <button className="view button" onClick={() => handleViewImages(product["image-urls"], product.id)}>
+  View Image
+</button>
+
               </span>
 
                 {/* Thêm nút Details, Update, Delete */}
@@ -236,10 +235,11 @@ return (
       </div>
     </div>
     <ImageModal 
-        show={showImageModal}
-        onClose={() => setShowImageModal(false)}
-        images={selectedImages}
-      />
+  show={showImageModal}
+  onClose={() => setShowImageModal(false)}
+  images={selectedImages}   
+  koiId={selectedKoiId}
+/>
     {/* Hiển thị modal */}
     <Modal 
         show={showModal}
