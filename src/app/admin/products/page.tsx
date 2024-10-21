@@ -244,9 +244,9 @@ return (
     productId={selectedProduct.id}
     productData={{
       id: selectedProduct.id,
-      name: selectedProduct["name-product"],
+      namekoi: selectedProduct["name-product"],
       dob: selectedProduct.dob,
-      description: selectedProduct["description-product"],
+      descriptionkoi: selectedProduct["description-product"],
       price: selectedProduct.price,
       quantity: selectedProduct.quantity,
       categoryid: selectedProduct["category-id"],

@@ -1,13 +1,15 @@
 // src/app/admin/products/UpdateModal.tsx
 import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { useSnackbar } from 'notistack'; // import useSnackbar
 
 interface Product {
     id: number;
     size: number;
     dob: Date;
-    description: string;
+    descriptionkoi: string;
     price: number;
-    name: string;
+    namekoi: string;
     quantity: number;
     categoryid: number;  
 }
@@ -34,48 +36,86 @@ const categoryNames: { [key: number]: string } = {
 
 const UpdateModal: React.FC<UpdateModalProps> = ({ show, onClose, productId, productData }) => {
     const [currentData, setCurrentData] = useState<Product | null>(productData);
+    const [updating, setUpdating] = useState(false);
+    const { enqueueSnackbar } = useSnackbar(); // Khai báo enqueueSnackbar
 
+    // Cập nhật currentData khi productData thay đổi
     useEffect(() => {
         if (productData) {
-            // Chuyển đổi chuỗi ngày từ backend thành đối tượng Date
             setCurrentData({
-                ...productData,
-                dob: new Date(productData.dob), // Chuyển đổi thành Date
+                id: productData.id,
+                namekoi: productData.namekoi, // Giữ tên sản phẩm
+                descriptionkoi: productData.descriptionkoi, // Giữ mô tả
+                dob: new Date(productData.dob), // Chuyển đổi sang date nếu cần
+                price: productData.price,
+                quantity: productData.quantity,
+                categoryid: productData.categoryid,
+                size: productData.size,
             });
         }
     }, [productData]);
 
     const handleUpdate = async () => {
         if (currentData) {
+            // Đảm bảo rằng tất cả các trường bắt buộc đều tồn tại
+            if (!currentData.namekoi || !currentData.descriptionkoi) {
+                console.error("Các trường bắt buộc bị thiếu:", {
+                    name: currentData.namekoi,
+                    description: currentData.descriptionkoi,
+                });
+                return; // Ngừng hàm nếu thiếu trường bắt buộc
+            }
+    
+            setUpdating(true); // Đặt trạng thái updating
+            console.log("Dữ liệu sản phẩm đang cập nhật:", currentData);
             try {
-                const response = await fetch(`${process.env.NEXT_PUBLIC_API}/api/koi/${currentData.id}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                    },
-                    body: JSON.stringify({
+                const response = await axios.put(
+                    `${process.env.NEXT_PUBLIC_API}/api/koi/${currentData.id}`,
+                    {
                         id: currentData.id,
                         size: currentData.size,
                         dob: currentData.dob.toISOString().split('T')[0], // Chuyển đổi thành chuỗi ngày
-                        description: currentData.description,
+                        descriptionkoi: currentData.descriptionkoi, // Đổi tên ở đây
                         price: currentData.price,
-                        name: currentData.name,
+                        namekoi: currentData.namekoi, // Đổi tên ở đây
                         quantity: currentData.quantity,
                         categoryid: currentData.categoryid,
-                    }),
-                });
-
-                const data = await response.json();
-                if (response.ok) {
-                    console.log(data.message); // Cập nhật thành công
+                    },
+                    {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                        }
+                    }
+                );
+    
+                // Kiểm tra phản hồi từ API
+                if (response.data.success) {
+                    console.log("Cập nhật sản phẩm thành công:", response.data.data);
                     onClose(); // Đóng modal sau khi cập nhật
+                    enqueueSnackbar("Cập nhật sản phẩm thành công!", { variant: "success" });
                 } else {
-                    console.error('Update failed:', data);
-                    // Xử lý thông báo lỗi nếu cần
+                    console.error('Cập nhật sản phẩm thất bại:', response.data);
+                    // Nếu API có trường "error" hoặc thông báo lỗi đang liên quan đến trường, xử lý trường hợp này
+                    if (response.data.error) {
+                        enqueueSnackbar(response.data.error, { variant: "error" });
+                    } else if (response.data['error-messages']) {
+                        const errorMessages = response.data['error-messages'];
+                        for (const key in errorMessages) {
+                            if (errorMessages.hasOwnProperty(key)) {
+                                const messages = errorMessages[key];
+                                messages.forEach((msg: string) => {
+                                    enqueueSnackbar(`${key}: ${msg}`, { variant: "error" });
+                                });
+                            }
+                        }
+                    }
                 }
             } catch (error) {
                 console.error('Error updating product:', error);
+                enqueueSnackbar("Đã xảy ra lỗi trong quá trình cập nhật sản phẩm", { variant: "error" });
+            } finally {
+                setUpdating(false); // Đặt trạng thái updating thành false
             }
         }
     };
@@ -106,28 +146,28 @@ const UpdateModal: React.FC<UpdateModalProps> = ({ show, onClose, productId, pro
                 <button className="close-button text-red-500" onClick={onClose}>
                     &times;
                 </button>
-                <h1 className="text-xl font-bold text-center mb-4">Cập nhật sản phẩm: {currentData.name}</h1>
+                <h1 className="text-xl font-bold text-center mb-4">Cập nhật sản phẩm: {currentData.namekoi}</h1>
                 <form>
                     <div className="grid grid-cols-2 gap-4 mb-4">
-                        <div>
-                            <label className="block font-semibold">Tên sản phẩm:</label>
-                            <input
-                                type="text"
-                                className="border border-gray-300 rounded p-2 w-full"
-                                value={currentData.name} 
-                                onChange={(e) => setCurrentData((prev) => ({ ...prev!, name: e.target.value }))}
-                            />
-                        </div>
+                    <div>
+    <label className="block font-semibold">Tên sản phẩm:</label>
+    <input
+        type="text"
+        className="border border-gray-300 rounded p-2 w-full"
+        value={currentData.namekoi} 
+        onChange={(e) => setCurrentData((prev) => ({ ...prev!, namekoi: e.target.value }))}
+    />
+</div>
                         <div>
                             <label className="block font-semibold">Đặc điểm:</label>
                             <input
                                 type="text"
                                 className="border border-gray-300 rounded p-2 w-full"
-                                value={currentData.description || ""}
+                                value={currentData.descriptionkoi || ""}
                                 onChange={(e) =>
                                     setCurrentData((prev) => ({
                                         ...prev!,
-                                        description: e.target.value,
+                                        descriptionkoi: e.target.value,
                                     }))
                                 }
                             />
