@@ -4,6 +4,8 @@ import "@/app/admin/style/ellipsis.css";
 import React, { useEffect, useState } from "react";
 import Modal from "@/app/admin/products/Modal";
 import ImageModal  from "@/app/admin/products/ViewImage"; // Import modal mới
+import UpdateModal from "@/app/admin/products/UpdateModal"; // Import UpdateModal
+import { useRouter } from "next/router"; // Import useRouter
 interface Product {
   id: number;
   "name-product": string;
@@ -15,6 +17,9 @@ interface Product {
   size: number;
   "image-urls":string[] | null;
 }
+
+
+
 // Hard-code danh sách tên danh mục dựa trên ID
 const categoryNames: { [key: number]: string } = {
   1: "Asagi",
@@ -42,7 +47,9 @@ export default function Products()
 const [showImageModal, setShowImageModal] = useState(false);
 const [selectedImages, setSelectedImages] = useState<string[]>([]); // Danh sách ảnh đã chọn
 const [selectedKoiId, setSelectedKoiId] = useState<number | null>(null); // Khai báo state cho koiId
-
+// State cho modal cập nhật
+const [showUpdateModal, setShowUpdateModal] = useState(false);
+const [selectedProduct, setSelectedProduct] = useState<Product | undefined>(undefined);  
   //API cGetAllProductAdmin
 const fetchProducts = async (page = 1, size = pageSize, searchTerm = "", sort = "") => {
   try {
@@ -95,9 +102,16 @@ const handleViewImages = (imageUrls: string[] | null, koiId: number) => {
   setSelectedKoiId(koiId); // Lưu koiId để upload ảnh cho đúng sản phẩm
   setShowImageModal(true);
 };
-
-
-
+const handleOpenUpdateModal = (productId: number) => {
+  const productData = products.find(product => product.id === productId);
+  if (productData) {
+    console.log("Dữ liệu sản phẩm:", productData); // Kiểm tra nội dung productData
+    setSelectedProduct(productData); // Đảm bảo thông tin đầy đủ
+    setShowUpdateModal(true);
+  } else {
+    alert("Không tìm thấy sản phẩm.");
+  }
+};
 
 const handleAddProduct = (newProduct: any) => {
   // Gửi request thêm sản phẩm mới vào API ở đây
@@ -185,25 +199,14 @@ return (
                 <span className="ellipsis">{product.size} cm</span>
                 <span className="flex justify-center">
                 <button className="view button" onClick={() => handleViewImages(product["image-urls"], product.id)}>
-  View Image
-</button>
-
-              </span>
+                View Image</button></span>
 
                 {/* Thêm nút Details, Update, Delete */}
                 <span className="flex justify-center space-x-2">
-                  <button
-                    className="details button"
-                    onClick={() => alert(`Details for ${product["name-product"]}`)}
-                  >
-                    Details
-                  </button>
-                  <button
-                    className="update button"
-                    onClick={() => alert(`Update ${product["name-product"]}`)}
-                  >
-                    Update
-                  </button>
+                <button 
+                  className="update button" 
+                    onClick={() => handleOpenUpdateModal(product.id)} // Lấy dữ liệu sản phẩm theo ID
+                        >Update</button>                     
                   <button
                     className="delete button"
                     onClick={() => alert(`Delete ${product["name-product"]}`)}
@@ -233,7 +236,24 @@ return (
           </button>
         ))}
       </div>
-    </div>
+    </div>  
+    {showUpdateModal && selectedProduct && (
+  <UpdateModal
+    show={showUpdateModal}
+    onClose={() => setShowUpdateModal(false)}
+    productId={selectedProduct.id}
+    productData={{
+      id: selectedProduct.id,
+      name: selectedProduct["name-product"],
+      dob: selectedProduct.dob,
+      description: selectedProduct["description-product"],
+      price: selectedProduct.price,
+      quantity: selectedProduct.quantity,
+      categoryid: selectedProduct["category-id"],
+      size: selectedProduct.size,
+    }} 
+  />
+)}
     <ImageModal 
   show={showImageModal}
   onClose={() => setShowImageModal(false)}
