@@ -3,20 +3,20 @@
   flex-direction: column;
   justify-content: flex-start; /* Đặt nội dung ở phía trên */
   align-items: center;
-  width: 70%; /* Thay đổi kích thước modal */
-  max-width: 500px; /* Kích thước tối đa */
-  height: 80%; /* Chiều cao tối đa của modal */
-  max-height: 600px; /* Chiều cao tối đa */
+  width: 80%; /* Tăng chiều rộng modal */
+  max-width: 800px; /* Thay đổi kích thước tối đa để xử lý kích thước lớn hơn */
+  height: auto; /* Để chiều cao tự động dựa trên nội dung */
+  max-height: 80%; /* Để điều chỉnh chiều cao tối đa theo nhu cầu */
   padding: 20px;
   background-color: white;
   border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Thay đổi độ sâu bóng */
   overflow-y: auto; /* Thêm cuộn dọc nếu nội dung vượt quá chiều cao */
 }
 
 .modal-header {
-  font-size: 1.5rem;
-  margin-bottom: 10px; /* Thay đổi khoảng cách */
+  font-size: 1.8rem; /* Thay đổi kích thước tiêu đề để dễ nhìn hơn */
+  margin-bottom: 20px; /* Tăng khoảng cách dưới tiêu đề */
   text-align: center;
 }
 
@@ -24,39 +24,44 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px; /* Thay đổi khoảng cách */
+  gap: 15px; /* Tăng khoảng cách giữa các phần tử */
   width: 100%;
 }
 
 .image-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr); /* 2 cột */
-  gap: 20px; /* Thay đổi khoảng cách */
+  grid-template-columns: repeat(3, 1fr); /* Thay đổi thành 3 cột cho nhiều hình ảnh hơn */
+  gap: 15px; /* Điều chỉnh khoảng cách giữa các hình ảnh */
   width: 100%;
 }
 
 .image-item {
   position: relative;
-  width: 100%;
-  padding-top: 150%; /* Thay đổi tỷ lệ để ảnh không quá lớn (3:4) */
+  height: 300px; /* Thiết lập chiều cao cho item hình ảnh */
+  overflow: hidden; /* Ẩn các phần hình ảnh tràn ra ngoài */
   border-radius: 8px;
-  overflow: hidden;
   border: 2px solid #ddd;
 }
 
 .image-item img {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover; /* Giữ nguyên tỷ lệ và cắt bớt nếu cần */
+  top: 50%; /* Đặt ở giữa theo chiều dọc */
+  left: 50%; /* Đặt ở giữa theo chiều ngang */
+  width: auto; /* Để chiều rộng tự động */
+  height: 100%; /* Chiều cao luôn là 100% để chiếm đầy chiều cao của item */
+  object-fit: cover; /* Cover để giữ nguyên tỷ lệ nhưng cắt bớt nếu cần */
+  transform: translate(-50%, -50%); /* Đưa hình ảnh về giữa */
+  transition: transform 0.3s ease; /* Thêm hiệu ứng khi hover */
+}
+
+.image-item:hover img {
+  transform: translate(-50%, -50%) scale(1.05); /* Zoom nhẹ khi hover để tăng tương tác */
 }
 
 .upload-button {
   background-color: #007bff;
   color: white;
-  padding: 8px 16px; /* Thay đổi kích thước nút */
+  padding: 10px 20px; /* Thay đổi kích thước nút để nhìn dễ hơn */
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -64,7 +69,7 @@
 }
 
 .upload-button:hover {
-  background-color: #0056b3;
+  background-color: #0056b3; /* Tối tối màu khi hover */
 }
 
 .close-button {
@@ -73,6 +78,35 @@
   right: 10px;
   background-color: transparent;
   border: none;
-  font-size: 1.2rem;
+  font-size: 1.5rem; /* Tăng kích thước chữ cho rõ ràng hơn */
   cursor: pointer;
+}
+.update {
+  background-color: #ffc107; /* Màu vàng */
+  color: white;
+  padding: 8px 12px; /* Kích thước lớn hơn cho nút */
+  border: none;
+  border-radius: 5px; /* Đường cong mềm mại hơn */
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease; /* Hiệu ứng chuyển đổi */
+}
+
+.update:hover {
+  background-color: #e0a800; /* Màu tối hơn khi hover */
+  transform: scale(1.05); /* Tăng kích thước nhẹ khi hover */
+}
+
+.delete {
+  background-color: #dc3545; /* Màu đỏ */
+  color: white;
+  padding: 8px 12px; /* Kích thước lớn hơn cho nút */
+  border: none;
+  border-radius: 5px; /* Đường cong mềm mại hơn */
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease; /* Hiệu ứng chuyển đổi */
+}
+
+.delete:hover {
+  background-color: #c82333; /* Màu tối hơn khi hover */
+  transform: scale(1.05); /* Tăng kích thước nhẹ khi hover */
 }

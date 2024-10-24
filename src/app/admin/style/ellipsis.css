@@ -1,50 +1,81 @@
 .ellipsis {
-    white-space: nowrap; /* Ngăn cách dòng */
-    overflow: hidden;    /* Ẩn phần thừa */
-    text-overflow: ellipsis; /* Thêm dấu ba chấm */
-  }
+  white-space: nowrap; /* Ngăn cách dòng */
+  overflow: hidden;    /* Ẩn phần thừa */
+  text-overflow: ellipsis; /* Thêm dấu ba chấm */
+}
 
-  .table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  
-  .table th, .table td {
-    padding: 10px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-  }
-  
-  .table img {
-    width: 80px; /* Kích thước hình ảnh nhỏ hơn */
-    height: auto; /* Để chiều cao tự động */
-    object-fit: cover; /* Cắt hình ảnh để vừa khung */
-  }
-  
-  .actions {
-    display: flex;
-    gap: 5px; /* Khoảng cách giữa các nút */
-  }
-  
-  .button {
-    padding: 5px 10px; /* Điều chỉnh padding cho nút */
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-  }
-  
-  .details {
-    background-color: #007bff;
-    color: white;
-  }
-  
-  .update {
-    background-color: #ffc107;
-    color: white;
-  }
-  
-  .delete {
-    background-color: #dc3545;
-    color: white;
-  }
-  
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th, .table td {
+  padding: 15px; /* Tăng padding để tạo không gian giữa các ô */
+  text-align: left; /* Căn trái */
+  border-bottom: 1px solid #ddd;
+}
+
+.table img {
+  width: 80px; /* Kích thước hình ảnh nhỏ hơn */
+  height: auto; /* Để chiều cao tự động */
+  object-fit: cover; /* Cắt hình ảnh để vừa khung */
+}
+
+.actions {
+  display: flex;
+  gap: 5px; /* Khoảng cách giữa các nút */
+}
+
+.button {
+  padding: 5px 10px; /* Điều chỉnh padding cho nút */
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.details {
+  background-color: #007bff;
+  color: white;
+}
+.update {
+  background-color: #007bff; /* Màu xanh dương */
+  color: white;
+  padding: 8px 12px; /* Kích thước lớn hơn cho nút */
+  border: none;
+  border-radius: 5px; /* Đường cong mềm mại */
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease; /* Hiệu ứng chuyển đổi */
+}
+
+.update:hover {
+  background-color: #0056b3; /* Màu tối hơn khi hover */
+  transform: scale(1.05); /* Tăng kích thước nhẹ khi hover */
+}
+
+.delete {
+  background-color: #ff7f50; /* Màu cam */
+  color: white;
+  padding: 8px 12px; /* Kích thước lớn hơn cho nút */
+  border: none;
+  border-radius: 5px; /* Đường cong mềm mại */
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease; /* Hiệu ứng chuyển đổi */
+}
+
+.delete:hover {
+  background-color: #e06741; /* Màu tối hơn khi hover */
+  transform: scale(1.05); /* Tăng kích thước nhẹ khi hover */
+}
+.create-button {
+  background-color: #007bff; /* Màu xanh dương */
+  color: white; /* Màu chữ trắng */
+  padding: 10px 20px; /* Khoảng cách bên trong */
+  border: none; /* Không có đường viền */
+  border-radius: 5px; /* Đường viền cong */
+  cursor: pointer; /* Con trỏ khi di chuột */
+  transition: background-color 0.3s ease; /* Hiệu ứng chuyển đổi màu nền */
+}
+
+.create-button:hover {
+  background-color: #0056b3; /* Màu xanh tối hơn khi hover */
+}

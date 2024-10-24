@@ -159,7 +159,7 @@ return (
           <option value="quantity">OrderBy Quantity</option>
         </select>
         <button
-          className="create button"
+          className="create-button"
         onClick={() => setShowModal(true)}>Create New Product</button>
       </div>
 
@@ -201,19 +201,19 @@ return (
                 <button className="view button" onClick={() => handleViewImages(product["image-urls"], product.id)}>
                 View Image</button></span>
 
-                {/* Thêm nút Details, Update, Delete */}
-                <span className="flex justify-center space-x-2">
-                <button 
-                  className="update button" 
-                    onClick={() => handleOpenUpdateModal(product.id)} // Lấy dữ liệu sản phẩm theo ID
-                        >Update</button>                     
-                  <button
-                    className="delete button"
-                    onClick={() => alert(`Delete ${product["name-product"]}`)}
-                  >
-                    Delete
-                  </button>
-                </span>
+             {/* Thêm nút Details, Update, Delete */}
+<span className="flex justify-center space-x-2">
+  <button 
+    className="update button" 
+    onClick={() => handleOpenUpdateModal(product.id)} // Lấy dữ liệu sản phẩm theo ID
+  >Update</button>
+  <button
+    className="delete button"
+    onClick={() => alert(`Delete ${product["name-product"]}`)}
+  >
+    Delete
+  </button>
+</span>
               </li>
             );
           })
