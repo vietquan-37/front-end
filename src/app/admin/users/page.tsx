@@ -28,37 +28,39 @@ export default function Users() {
   // Hàm lấy danh sách người dùng từ API
   const fetchUsers = async (page = 1, size = pageSize, searchTerm = "", sort = "") => {
     const token = localStorage.getItem('token');
+    
     if (!token) {
       router.push('/login'); // Điều hướng về trang đăng nhập nếu không có token
       return;
     }
-    try {
-           // Khởi tạo URL
-           const url = new URL(`${process.env.NEXT_PUBLIC_API}/api/admin`);
-           url.searchParams.append("page", String(page));
-           url.searchParams.append("pageSize", String(size));
-     
-           // Thêm searchTerm và sort chỉ khi chúng có giá trị
-           if (searchTerm) url.searchParams.append("search", searchTerm);
-           if (sort) url.searchParams.append("sort", sort);
-    
-            const response = await fetch(url.toString(), {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`, // Thêm token vào header
-        'Content-Type': 'application/json', // Đảm bảo Content-Type đúng
-      },
-    });
 
-    // Kiểm tra trạng thái phản hồi
-    if (response.status === 401) {
-      localStorage.removeItem('token'); // Xóa token
-      router.push('/login'); // Điều hướng đến trang đăng nhập
-      return; // Ngừng thực hiện nếu không có quyền
-    }
-    if (!response.ok) {
-      throw new Error(`Error: ${response.status} ${response.statusText}`);
-    }
+    try {
+      // Khởi tạo URL
+      const url = new URL(`${process.env.NEXT_PUBLIC_API}/api/admin`);
+      url.searchParams.append("page", String(page));
+      url.searchParams.append("pageSize", String(size));
+      if (searchTerm) url.searchParams.append("search", searchTerm);
+      if (sort) url.searchParams.append("sort", sort);
+
+      const response = await fetch(url.toString(), {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`, // Thêm token vào header
+          'Content-Type': 'application/json', // Đảm bảo Content-Type đúng
+        },
+      });
+
+      // Kiểm tra trạng thái phản hồi
+      if (response.status === 401) {
+        localStorage.removeItem('token'); // Xóa token
+        router.push('/login'); // Điều hướng đến trang đăng nhập
+        return; // Ngừng thực hiện nếu không có quyền
+      }
+      
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status} ${response.statusText}`);
+      }
+      
       const data = await response.json();
       setUsers(data.data["list-data"]);
       setTotalPages(data.data["total-page"]);
@@ -68,39 +70,16 @@ export default function Users() {
     }
   };
 
- // Hàm xử lý sự kiện đăng nhập
- const handleLogin = async (credentials: any) => {
-  try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API}/api/authentication/login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(credentials),
-    });
+  // Gọi fetchUsers để lấy dữ liệu người dùng mặc định khi component khởi động
+  useEffect(() => {
+    fetchUsers(currentPage, pageSize, "", ""); // Gọi mà không có searchTerm và sort
+  }, []);
 
-    if (response.ok) {
-      const data = await response.json();
-      // Lưu token vào localStorage
-      localStorage.setItem('token', data.token);
-      // Gọi lại fetchUsers sau khi đăng nhập thành công
-      fetchUsers(currentPage, pageSize, searchTerm, sort);
-    } else {
-      console.error("Login failed");
-    }
-  } catch (error) {
-    console.error("Error during login:", error);
-  }
-};
+  // Gọi lại fetchUsers mỗi khi có thay đổi về currentPage, pageSize, searchTerm hoặc sort
+  useEffect(() => {
+    fetchUsers(currentPage, pageSize, searchTerm, sort);
+  }, [currentPage, pageSize, searchTerm, sort]);
 
- // Gọi fetchUsers để lấy dữ liệu người dùng mặc định khi component khởi động
- useEffect(() => {
-  fetchUsers(currentPage, pageSize, "", ""); // Gọi mà không có searchTerm và sort
-}, []);
-// Gọi lại fetchUsers mỗi khi có thay đổi về currentPage, pageSize, searchTerm hoặc sort
-useEffect(() => {
-  fetchUsers(currentPage, pageSize, searchTerm, sort);
-}, [currentPage, pageSize, searchTerm, sort]);
   // Hàm xử lý sự kiện khi chọn loại người dùng
   const handleFilterChange = (value: string) => {
     switch (value) {
@@ -115,6 +94,7 @@ useEffect(() => {
         break;
     }
   };
+
   return (
     <Layout>
       <div className="p-4">
@@ -130,8 +110,8 @@ useEffect(() => {
             className="border p-2 rounded w-full md:w-1/5 mr-0 md:mr-4 mb-2 md:mb-0"
           />
 
-            {/* Dropdown cho loại người dùng */}
-            <select
+          {/* Dropdown cho loại người dùng */}
+          <select
             onChange={(e) => handleFilterChange(e.target.value)}
             className="border p-2 rounded w-full md:w-1/6"
           >
@@ -139,11 +119,10 @@ useEffect(() => {
             <option value="name">OrderBy Name</option>
             <option value="email">OrderBy Email</option>
           </select>
-
         </div>
 
         {/* Tiêu đề */}
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4 font-semibold mb-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 font-semibold mb-4">
           <span>ID</span>
           <span>User Name</span>
           <span>Email</span>
@@ -151,17 +130,15 @@ useEffect(() => {
           <span>Phone</span>
           <span>Status</span>
           <span>Role</span>
-          <span>Action</span>
         </div>
 
-       
         {/* Danh sách người dùng */}
         <ul className="bg-white rounded-lg shadow-md">
           {users.length > 0 ? (
             users.map((user) => (
               <li
                 key={user.id}
-                className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4 p-4 border-b hover:bg-gray-100 transition duration-300"
+                className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 p-4 border-b hover:bg-gray-100 transition duration-300"
               >
                 <span>{user.id}</span>
                 <span className="ellipsis">{user["full-name"]}</span>
@@ -170,12 +147,6 @@ useEffect(() => {
                 <span className="ellipsis">{user["telephone-number"]}</span>
                 <span className="ellipsis">{user.status = 1 ? "Active" : "Inactive"}</span>
                 <span className="ellipsis">{user["role-name"] || "N/A"}</span>
-                {/* Nút hành động */}
-              <div className="flex justify-center space-x-2">
-                <button className="bg-yellow-500 text-white px-2 py-1 rounded">Edit</button>
-                <button className="bg-red-500 text-white px-2 py-1 rounded">Delete</button>
-                <button className="bg-blue-500 text-white px-2 py-1 rounded">View</button>
-              </div>
               </li>
             ))
           ) : (
