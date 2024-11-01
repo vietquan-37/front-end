@@ -1,5 +1,5 @@
 import React from 'react';
-
+import "@/app/admin/style/delete.css"; // Nhập CSS mới
 interface DeleteModalProps {
   show: boolean;
   onClose: () => void;

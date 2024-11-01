@@ -1,112 +1,127 @@
-.modal-container {
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.9); /* Darker overlay for better contrast */
   display: flex;
-  flex-direction: column;
-  justify-content: flex-start; /* Đặt nội dung ở phía trên */
   align-items: center;
-  width: 80%; /* Tăng chiều rộng modal */
-  max-width: 800px; /* Thay đổi kích thước tối đa để xử lý kích thước lớn hơn */
-  height: auto; /* Để chiều cao tự động dựa trên nội dung */
-  max-height: 80%; /* Để điều chỉnh chiều cao tối đa theo nhu cầu */
-  padding: 20px;
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Thay đổi độ sâu bóng */
-  overflow-y: auto; /* Thêm cuộn dọc nếu nội dung vượt quá chiều cao */
-}
-
-.modal-header {
-  font-size: 1.8rem; /* Thay đổi kích thước tiêu đề để dễ nhìn hơn */
-  margin-bottom: 20px; /* Tăng khoảng cách dưới tiêu đề */
-  text-align: center;
+  justify-content: center;
+  z-index: 1000;
 }
 
 .modal-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 15px; /* Tăng khoảng cách giữa các phần tử */
-  width: 100%;
+  background: white;
+  padding: 40px; /* Giữ nguyên padding để có không gian thoáng */
+  border-radius: 10px; /* Bo góc cho modal */
+  width: 90%; /* Độ rộng 90% của màn hình với padding */
+  max-width: 1200px; /* Độ rộng tối đa cho màn hình lớn */
+  height: 80vh; /* Chiều cao tối đa là 80% chiều cao viewport */
+  max-height: 90vh; /* Chiều cao tối đa để cho phép không gian cho cuộn */
+  overflow-y: auto; /* Cho phép cuộn dọc nếu cần thiết */
+  position: relative; /* Định vị cho nút đóng */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); /* Đổ bóng tốt hơn để dễ nhìn */
+}
+
+.close-button {
+  position: absolute;
+  right: 20px; /* Adequate spacing from the edge */
+  top: 20px; /* Adequate spacing from the top */
+  background-color: transparent;
+  border: none;
+  font-size: 2rem; /* Larger close button */
+  cursor: pointer;
+}
+
+.modal-header {
+  font-size: 2rem; /* Larger header font size */
+  margin-bottom: 20px;
+  text-align: center;
 }
 
 .image-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr); /* Thay đổi thành 3 cột cho nhiều hình ảnh hơn */
-  gap: 15px; /* Điều chỉnh khoảng cách giữa các hình ảnh */
-  width: 100%;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Responsive grid */
+  gap: 20px; /* More gap between images */
 }
 
 .image-item {
   position: relative;
-  height: 300px; /* Thiết lập chiều cao cho item hình ảnh */
-  overflow: hidden; /* Ẩn các phần hình ảnh tràn ra ngoài */
-  border-radius: 8px;
-  border: 2px solid #ddd;
+  border-radius: 10px; /* Rounded corners */
+  border: 3px solid #ddd; /* Thicker border for images */
+  overflow: hidden;
+  height: 350px; /* Increased height for images */
+  transition: transform 0.3s ease;
+}
+
+.image-item:hover {
+  transform: scale(1.05); /* Slightly larger on hover */
 }
 
 .image-item img {
-  position: absolute;
-  top: 50%; /* Đặt ở giữa theo chiều dọc */
-  left: 50%; /* Đặt ở giữa theo chiều ngang */
-  width: auto; /* Để chiều rộng tự động */
-  height: 100%; /* Chiều cao luôn là 100% để chiếm đầy chiều cao của item */
-  object-fit: cover; /* Cover để giữ nguyên tỷ lệ nhưng cắt bớt nếu cần */
-  transform: translate(-50%, -50%); /* Đưa hình ảnh về giữa */
-  transition: transform 0.3s ease; /* Thêm hiệu ứng khi hover */
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Maintain aspect ratio */
 }
 
-.image-item:hover img {
-  transform: translate(-50%, -50%) scale(1.05); /* Zoom nhẹ khi hover để tăng tương tác */
+.no-image {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  color: gray;
+  font-weight: bold;
+  font-size: 1.5rem; /* Larger font for "No Image" message */
+}
+
+.button-group {
+  display: flex;
+  justify-content: space-between; /* Space between buttons */
+  margin-top: 20px; /* Space above buttons */
+}
+
+.upload-button, .cancel-button {
+  padding: 15px 20px; /* Increased button padding */
+  border: none;
+  border-radius: 5px; /* Rounded corners for buttons */
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
 .upload-button {
   background-color: #007bff;
   color: white;
-  padding: 10px 20px; /* Thay đổi kích thước nút để nhìn dễ hơn */
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+  flex: 1; /* Allow buttons to grow */
+  margin-right: 10px; /* Space between buttons */
 }
 
 .upload-button:hover {
-  background-color: #0056b3; /* Tối tối màu khi hover */
+  background-color: #0056b3; /* Darker blue on hover */
 }
 
-.close-button {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background-color: transparent;
-  border: none;
-  font-size: 1.5rem; /* Tăng kích thước chữ cho rõ ràng hơn */
-  cursor: pointer;
-}
-.update {
-  background-color: #ffc107; /* Màu vàng */
+.cancel-button {
+  background-color: #dc3545; /* Red color */
   color: white;
-  padding: 8px 12px; /* Kích thước lớn hơn cho nút */
-  border: none;
-  border-radius: 5px; /* Đường cong mềm mại hơn */
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.3s ease; /* Hiệu ứng chuyển đổi */
+  flex: 1; /* Allow buttons to grow */
 }
 
-.update:hover {
-  background-color: #e0a800; /* Màu tối hơn khi hover */
-  transform: scale(1.05); /* Tăng kích thước nhẹ khi hover */
+.cancel-button:hover {
+  background-color: #c82333; /* Darker red on hover */
 }
 
-.delete {
-  background-color: #dc3545; /* Màu đỏ */
-  color: white;
-  padding: 8px 12px; /* Kích thước lớn hơn cho nút */
-  border: none;
-  border-radius: 5px; /* Đường cong mềm mại hơn */
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.3s ease; /* Hiệu ứng chuyển đổi */
-}
+/* Optional: Media query for smaller screens */
+@media (max-width: 768px) {
+  .modal-content {
+    width: 95%; /* Full width on small screens */
+    padding: 20px; /* Less padding on small screens */
+  }
 
-.delete:hover {
-  background-color: #c82333; /* Màu tối hơn khi hover */
-  transform: scale(1.05); /* Tăng kích thước nhẹ khi hover */
+  .modal-header {
+    font-size: 1.5rem; /* Smaller header font size */
+  }
+
+  .no-image {
+    font-size: 1rem; /* Smaller font for "No Image" message */
+  }
 }
