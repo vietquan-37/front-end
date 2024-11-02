@@ -3,11 +3,11 @@ import Layout from "@/app/admin/layoutAdmin";
 import "@/app/admin/style/ellipsis.css";
 import React, { useEffect, useState } from "react";
 import Modal from "@/app/admin/products/Modal";
-import ImageModal  from "@/app/admin/products/ViewImage"; // Import modal mới
 import UpdateModal from "@/app/admin/products/UpdateModal"; // Import UpdateModal
 import { useRouter } from "next/router"; // Import useRouter
 import DeleteModal from "./DeleteModal";
 import axios from "axios";
+import ImageGalleryModal from "@/app/admin/products/ViewImage";
 interface Product {
   id: number;
   "name-product": string;
@@ -325,7 +325,7 @@ return (
         />
       )}
 
-    <ImageModal 
+    <ImageGalleryModal 
   show={showImageModal}
   onClose={() => setShowImageModal(false)}
   images={selectedImages}   

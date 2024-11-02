@@ -1,68 +1,62 @@
-.modal-overlay {
+.gallery-modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.9); /* Darker overlay for better contrast */
+  background: rgba(0, 0, 0, 0.85); /* Overlay tối hơn để cải thiện độ tương phản */
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
 }
 
-.modal-content {
+.gallery-modal-content {
   background: white;
-  padding: 40px; /* Giữ nguyên padding để có không gian thoáng */
-  border-radius: 10px; /* Bo góc cho modal */
-  width: 90%; /* Độ rộng 90% của màn hình với padding */
-  max-width: 1200px; /* Độ rộng tối đa cho màn hình lớn */
-  height: 80vh; /* Chiều cao tối đa là 80% chiều cao viewport */
+  padding: 20px; /* Padding thoáng hơn */
+  border-radius: 12px; /* Bo góc lớn hơn cho modal */
+  width: 100%; /* Chiều rộng 100% của màn hình */
+  max-width: 1200px; /* Độ rộng tối đa cho màn hình lớn hơn */
+  height: 80vh; /* Chiều cao 80% viewport */
   max-height: 90vh; /* Chiều cao tối đa để cho phép không gian cho cuộn */
   overflow-y: auto; /* Cho phép cuộn dọc nếu cần thiết */
-  position: relative; /* Định vị cho nút đóng */
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); /* Đổ bóng tốt hơn để dễ nhìn */
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6); /* Đổ bóng tốt hơn */
 }
 
 .close-button {
   position: absolute;
-  right: 20px; /* Adequate spacing from the edge */
-  top: 20px; /* Adequate spacing from the top */
+  right: 20px; 
+  top: 20px; 
   background-color: transparent;
   border: none;
-  font-size: 2rem; /* Larger close button */
+  font-size: 2.5rem; 
   cursor: pointer;
 }
 
 .modal-header {
-  font-size: 2rem; /* Larger header font size */
+  font-size: 2rem; 
   margin-bottom: 20px;
   text-align: center;
 }
 
 .image-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Responsive grid */
-  gap: 20px; /* More gap between images */
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Cột hình ảnh linh hoạt */
+  gap: 15px; /* Khoảng cách giữa các hình ảnh */
 }
 
 .image-item {
   position: relative;
-  border-radius: 10px; /* Rounded corners */
-  border: 3px solid #ddd; /* Thicker border for images */
+  border-radius: 8px; /* Bo góc cho hình ảnh */
+  border: 2px solid #ccc; 
   overflow: hidden;
-  height: 350px; /* Increased height for images */
-  transition: transform 0.3s ease;
-}
-
-.image-item:hover {
-  transform: scale(1.05); /* Slightly larger on hover */
+  height: 300px; /* Tăng chiều cao hình ảnh */
 }
 
 .image-item img {
   width: 100%;
   height: 100%;
-  object-fit: cover; /* Maintain aspect ratio */
+  object-fit: cover; /* Bảo toàn tỷ lệ khung hình */
 }
 
 .no-image {
@@ -72,56 +66,57 @@
   height: 100%;
   color: gray;
   font-weight: bold;
-  font-size: 1.5rem; /* Larger font for "No Image" message */
+  font-size: 1.2rem; 
 }
 
 .button-group {
   display: flex;
-  justify-content: space-between; /* Space between buttons */
-  margin-top: 20px; /* Space above buttons */
+  justify-content: space-between; 
+  margin-top: 20px; 
 }
 
-.upload-button, .cancel-button {
-  padding: 15px 20px; /* Increased button padding */
+.upload-button,
+.cancel-button {
+  padding: 12px 15px; 
   border: none;
-  border-radius: 5px; /* Rounded corners for buttons */
+  border-radius: 5px; 
   cursor: pointer;
   transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
 .upload-button {
-  background-color: #007bff;
+  background-color: #28a745; 
   color: white;
-  flex: 1; /* Allow buttons to grow */
-  margin-right: 10px; /* Space between buttons */
+  flex: 1; 
+  margin-right: 10px; 
 }
 
 .upload-button:hover {
-  background-color: #0056b3; /* Darker blue on hover */
+  background-color: #218838; 
 }
 
 .cancel-button {
-  background-color: #dc3545; /* Red color */
+  background-color: #dc3545; 
   color: white;
-  flex: 1; /* Allow buttons to grow */
+  flex: 1; 
 }
 
 .cancel-button:hover {
-  background-color: #c82333; /* Darker red on hover */
+  background-color: #c82333; 
 }
 
-/* Optional: Media query for smaller screens */
+/* Media query cho màn hình nhỏ hơn */
 @media (max-width: 768px) {
-  .modal-content {
-    width: 95%; /* Full width on small screens */
-    padding: 20px; /* Less padding on small screens */
+  .gallery-modal-content {
+    width: 95%; /* Chiều rộng 95% cho màn hình nhỏ */
+    padding: 15px; /* Padding ít hơn trên màn hình nhỏ */
   }
 
   .modal-header {
-    font-size: 1.5rem; /* Smaller header font size */
+    font-size: 1.5rem; 
   }
 
   .no-image {
-    font-size: 1rem; /* Smaller font for "No Image" message */
+    font-size: 1rem; 
   }
 }
