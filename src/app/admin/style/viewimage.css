@@ -1,122 +1,100 @@
-.gallery-modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.85); /* Overlay tối hơn để cải thiện độ tương phản */
+.modal-view {
   display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* Đặt nội dung ở phía trên */
   align-items: center;
-  justify-content: center;
-  z-index: 1000;
+  width: 80%; /* Tăng chiều rộng modal */
+  max-width: 800px; /* Thay đổi kích thước tối đa để xử lý kích thước lớn hơn */
+  height: auto; /* Để chiều cao tự động dựa trên nội dung */
+  max-height: 90%; /* Tăng chiều cao tối đa để tránh chạm vào cạnh trên và dưới màn hình */
+  padding: 20px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  overflow-y: auto; /* Thêm cuộn dọc nếu nội dung vượt quá chiều cao */
 }
 
-.gallery-modal-content {
-  background: white;
-  padding: 20px; /* Padding thoáng hơn */
-  border-radius: 12px; /* Bo góc lớn hơn cho modal */
-  width: 100%; /* Chiều rộng 100% của màn hình */
-  max-width: 1200px; /* Độ rộng tối đa cho màn hình lớn hơn */
-  height: 80vh; /* Chiều cao 80% viewport */
-  max-height: 90vh; /* Chiều cao tối đa để cho phép không gian cho cuộn */
-  overflow-y: auto; /* Cho phép cuộn dọc nếu cần thiết */
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6); /* Đổ bóng tốt hơn */
-}
-
-.close-button {
-  position: absolute;
-  right: 20px; 
-  top: 20px; 
-  background-color: transparent;
-  border: none;
-  font-size: 2.5rem; 
-  cursor: pointer;
-}
-
-.modal-header {
-  font-size: 2rem; 
+.modal-title {
+  font-size: 1.8rem;
   margin-bottom: 20px;
   text-align: center;
 }
 
-.image-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Cột hình ảnh linh hoạt */
-  gap: 15px; /* Khoảng cách giữa các hình ảnh */
-}
-
-.image-item {
-  position: relative;
-  border-radius: 8px; /* Bo góc cho hình ảnh */
-  border: 2px solid #ccc; 
-  overflow: hidden;
-  height: 300px; /* Tăng chiều cao hình ảnh */
-}
-
-.image-item img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover; /* Bảo toàn tỷ lệ khung hình */
-}
-
-.no-image {
+.modal-body {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  height: 100%;
-  color: gray;
-  font-weight: bold;
-  font-size: 1.2rem; 
+  gap: 15px; /* Tăng khoảng cách giữa các phần tử */
+  width: 100%;
 }
 
-.button-group {
-  display: flex;
-  justify-content: space-between; 
-  margin-top: 20px; 
+.modal-image-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* Thay đổi thành 3 cột cho nhiều hình ảnh hơn */
+  gap: 15px; /* Điều chỉnh khoảng cách giữa các hình ảnh */
+  width: 100%;
 }
 
-.upload-button,
-.cancel-button {
-  padding: 12px 15px; 
-  border: none;
-  border-radius: 5px; 
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.3s ease;
+.modal-image-item {
+  position: relative;
+  height: 300px; /* Thiết lập chiều cao cho item hình ảnh */
+  overflow: hidden; /* Ẩn các phần hình ảnh tràn ra ngoài */
+  border-radius: 8px;
+  border: 2px solid #ddd;
 }
 
-.upload-button {
+.modal-image-item img {
+  position: absolute;
+  top: 50%; /* Đặt ở giữa theo chiều dọc */
+  left: 50%; /* Đặt ở giữa theo chiều ngang */
+  width: auto; /* Để chiều rộng tự động */
+  height: 100%; /* Chiều cao luôn là 100% để chiếm đầy chiều cao của item */
+  object-fit: cover; /* Cover để giữ nguyên tỷ lệ nhưng cắt bớt nếu cần */
+  transform: translate(-50%, -50%); /* Đưa hình ảnh về giữa */
+  transition: transform 0.3s ease; /* Thêm hiệu ứng khi hover */
+}
+
+.modal-image-item:hover img {
+  transform: translate(-50%, -50%) scale(1.05); /* Zoom nhẹ khi hover để tăng tương tác */
+}
+
+.modal-upload-button,
+.modal-cancel-button {
   background-color: #28a745; 
   color: white;
-  flex: 1; 
-  margin-right: 10px; 
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
-.upload-button:hover {
-  background-color: #218838; 
+.modal-upload-button:hover,
+.modal-cancel-button:hover {
+  background-color: #0056b3; /* Tối tối màu khi hover */
 }
 
-.cancel-button {
-  background-color: #dc3545; 
+.modal-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: transparent;
+  border: none;
+  font-size: 1.5rem; /* Tăng kích thước chữ cho rõ ràng hơn */
+  cursor: pointer;
+}
+
+.modal-exit {
+  background-color: #dc3545; /* Màu đỏ */
   color: white;
-  flex: 1; 
+  padding: 8px 12px; /* Kích thước lớn hơn cho nút */
+  border: none;
+  border-radius: 5px; /* Đường cong mềm mại hơn */
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease; /* Hiệu ứng chuyển đổi */
 }
 
-.cancel-button:hover {
-  background-color: #c82333; 
-}
-
-/* Media query cho màn hình nhỏ hơn */
-@media (max-width: 768px) {
-  .gallery-modal-content {
-    width: 95%; /* Chiều rộng 95% cho màn hình nhỏ */
-    padding: 15px; /* Padding ít hơn trên màn hình nhỏ */
-  }
-
-  .modal-header {
-    font-size: 1.5rem; 
-  }
-
-  .no-image {
-    font-size: 1rem; 
-  }
+.modal-exit:hover {
+  background-color: #c82333; /* Màu tối hơn khi hover */
+  transform: scale(1.05); /* Tăng kích thước nhẹ khi hover */
 }

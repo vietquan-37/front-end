@@ -1,63 +1,84 @@
 /* deleteModal.css */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.7); /* Overlay màu tối */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
+.delete-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8); /* Overlay màu tối hơn */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.delete-modal-content {
+  background: #fff; /* Màu nền trắng */
+  padding: 30px; /* Tăng padding cho nội dung */
+  border-radius: 10px; /* Bo góc cho modal */
+  width: 90%; /* Độ rộng 90% */
+  max-width: 450px; /* Độ rộng tối đa lớn hơn */
+  max-height: 300px; /* Giới hạn chiều cao tối đa */
+  overflow: hidden; /* Thêm cuộn nếu nội dung vượt quá chiều cao */
+  text-align: center; /* Canh giữa nội dung */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5); /* Đổ bóng cho modal */
+}
+
+.delete-modal-title {
+  font-size: 1.5rem; /* Kích thước chữ tiêu đề lớn hơn */
+  margin-bottom: 15px; /* Khoảng cách dưới tiêu đề */
+  color: #333; /* Màu chữ tối */
+}
+
+/* deleteModal.css */
+.delete-modal-actions {
+  display: flex;
+  justify-content: space-between; /* Căn chỉnh đều hai bên */
+  margin-top: 20px; /* Khoảng cách trên nút */
+}
+
+.delete-confirm-button, .delete-cancel-button {
+  flex: 1; /* Làm cho các nút cùng có kích thước */
+  padding: 12px; /* Padding cho nút */
+  border: none;
+  border-radius: 5px; /* Bo góc cho nút */
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease; /* Hiệu ứng chuyển màu và phóng to */
+  font-size: 1rem; /* Kích thước chữ */
+  margin: 0 5px; /* Thêm khoảng cách bên giữa hai nút */
+}
+
+/* Màu nền và chữ cho nút xác nhận */
+.delete-confirm-button {
+  background-color: #28a745; /* Màu xanh lá cho xác nhận */
+  color: white; /* Màu chữ trắng */
+}
+
+.delete-confirm-button:hover {
+  background-color: #218838; /* Màu tối hơn khi hover */
+  transform: scale(1.05); /* Tăng kích thước khi hover */
+}
+
+/* Màu nền và chữ cho nút hủy */
+.delete-cancel-button {
+  background-color: #dc3545; /* Màu đỏ cho hủy */
+  color: white; /* Màu chữ trắng */
+}
+
+.delete-cancel-button:hover {
+  background-color: #c82333; /* Màu tối hơn khi hover */
+  transform: scale(1.05); /* Tăng kích thước khi hover */
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  .delete-modal-actions {
+      flex-direction: column; /* Xếp chồng các nút trên các thiết bị nhỏ hơn */
+      gap: 10px; /* Giảm khoảng cách giữa các nút */
   }
-  
-  .modal-content {
-    background: white;
-    padding: 20px; /* Giữ nguyên padding cho nội dung */
-    border-radius: 10px; /* Bo góc cho modal */
-    width: 90%; /* Độ rộng 90% */
-    max-width: 400px; /* Độ rộng tối đa */
-    max-height: 200px; /* Giới hạn chiều cao tối đa */
-    overflow: auto; /* Thêm cuộn nếu nội dung vượt quá chiều cao */
-    text-align: center; /* Canh giữa nội dung */
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); /* Đổ bóng cho modal */
+
+  .delete-confirm-button, .delete-cancel-button {
+      width: 100%; /* Chiều rộng đầy đủ cho các nút */
+      margin: 0; /* Xóa khoảng cách bên */
   }
-  
-  .modal-title {
-    font-size: 1.25rem; /* Kích thước chữ tiêu đề */
-    margin-bottom: 10px; /* Khoảng cách dưới tiêu đề */
-  }
-  
-  .modal-actions {
-    display: flex;
-    justify-content: space-between; /* Căn giữa các nút */
-    margin-top: 15px; /* Khoảng cách trên nút */
-  }
-  
-  .confirm-button, .cancel-button {
-    padding: 8px 12px; /* Padding cho nút */
-    border: none;
-    border-radius: 5px; /* Bo góc cho nút */
-    cursor: pointer;
-    transition: background-color 0.3s ease; /* Hiệu ứng chuyển màu */
-  }
-  
-  .confirm-button {
-    background-color: #28a745; /* Màu xanh lá cho xác nhận */
-    color: white; /* Màu chữ trắng */
-  }
-  
-  .confirm-button:hover {
-    background-color: #218838; /* Màu tối hơn khi hover */
-  }
-  
-  .cancel-button {
-    background-color: #dc3545; /* Màu đỏ cho hủy */
-    color: white; /* Màu chữ trắng */
-  }
-  
-  .cancel-button:hover {
-    background-color: #c82333; /* Màu tối hơn khi hover */
-  }
-  
+}

@@ -19,50 +19,31 @@ const ImageModal: React.FC<ImageModalProps> = ({ show, onClose, images, koiId })
   };
 
   const handleUploadImage = async () => {
-    if (!koiId) return alert("Không có KoiId.");
-    if (selectedImageId !== null && !selectedFile) {
-      return alert("Chưa chọn file mới để cập nhật ảnh.");
-    }
-    if (selectedImageId === null && !selectedFile) {
-      return alert("Chưa chọn file để upload.");
-    }
-
+    if (!koiId || !selectedFile) return alert("Chưa chọn file hoặc không có Koi.");
     const formData = new FormData();
-    if (selectedFile) {
-      formData.append("files", selectedFile);
-    }
-
+    formData.append("files", selectedFile);
     try {
-      let response;
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API}/api/KOIImage/${koiId}/images`, {
+        method: "POST",
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+        body: formData,
+      });
+      if (response.ok) {
+        const result = await response.json();
+        alert("Ảnh đã được upload thành công!");
 
-      if (selectedImageId === null) {
-        response = await fetch(`${process.env.NEXT_PUBLIC_API}/api/KOIImage/${koiId}/images`, {
-          method: "POST",
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
-          },
-          body: formData,
-        });
+        // Bạn có thể cập nhật danh sách ảnh sau khi upload thành công nếu muốn:
+        // Thêm URL ảnh vừa upload vào danh sách hiện tại
+        const newImageUrl = result.data; // Giả định API trả về URL ảnh
+        onClose(); // Đóng modal sau khi upload
       } else {
-        response = await fetch(`${process.env.NEXT_PUBLIC_API}/api/KOIImage/${koiId}/images/${selectedImageId}`, {
-          method: "PUT",
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
-          },
-          body: formData,
-        });
+        alert("Lỗi khi upload ảnh!");
       }
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        alert("Lỗi khi upload ảnh: " + (errorData.message || "Không rõ lỗi!"));
-        return;
-      }
-
-      alert(selectedImageId === null ? "Ảnh đã được thêm thành công!" : "Ảnh đã được cập nhật thành công!");
-      onClose(); // Close modal after successful upload
     } catch (error) {
-      alert("Có lỗi xảy ra trong quá trình upload.");
+      console.error("Upload error:", error);
+      alert("Lỗi khi upload ảnh!");
     }
   };
 
@@ -82,34 +63,39 @@ const ImageModal: React.FC<ImageModalProps> = ({ show, onClose, images, koiId })
   if (!show) return null;
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-content">
-        <button className="close-button" onClick={onClose}>✖</button>
-        <h2 className="modal-header">Quản lý hình ảnh</h2>
-        <div className="image-grid">
-          {images.map((image, index) => (
-            <div key={index} className="image-item" onClick={() => handleImageClick(index)}>
-              {image ? (
-                <img 
-                  src={image} 
-                  alt={`Hình ảnh ${index + 1}`}  
-                  onError={() => console.error(`Failed to load image at ${image}`)} 
-                />
-              ) : (
-                <div className="no-image">No Image</div>
-              )}
-            </div>
-          ))}
-        </div>
-        <input type="file" onChange={handleFileChange} className="mt-4" />
-        <div className="button-group">
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70">
+      <div className="modal-view">
+        <button className="modal-close" onClick={onClose}>
+          &times;
+        </button>
+        <h2 className="modal-title">Hình ảnh sản phẩm</h2>
+        <div className="modal-body">
+          <button className="modal-exit" onClick={onClose}>Exit</button>
+          <div className="modal-image-grid">
+            {[...Array(4)].map((_, index) => (
+              <div key={index} className="modal-image-item" onClick={() => handleImageClick(index)}>
+                {images[index] ? (
+                  <img src={images[index]} alt={`Hình ảnh ${index + 1}`} />
+                ) : (
+                  <div className="flex items-center justify-center text-gray-400">No Image</div>
+                )}
+              </div>
+            ))}
+          </div>
+          <input type="file" id="fileInput" onChange={handleFileChange} className="modal-file-input mt-4" />
           {selectedImageId !== null ? (
             <>
-              <button onClick={handleUploadImage} className="upload-button">Cập nhật ảnh</button>
-              <button onClick={handleCancelUpdate} className="cancel-button">Hủy</button>
+              <button onClick={handleUploadImage} className="modal-upload-button mt-2">
+                Cập nhật ảnh
+              </button>
+              <button onClick={handleCancelUpdate} className="modal-cancel-button mt-2">
+                Hủy
+              </button>
             </>
           ) : (
-            <button onClick={handleUploadImage} className="upload-button">Thêm ảnh</button>
+            <button onClick={handleUploadImage} className="modal-upload-button mt-2">
+              Thêm ảnh
+            </button>
           )}
         </div>
       </div>
