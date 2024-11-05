@@ -47,7 +47,7 @@
   position: absolute;
   top: 50%; /* Đặt ở giữa theo chiều dọc */
   left: 50%; /* Đặt ở giữa theo chiều ngang */
-  width: auto; /* Để chiều rộng tự động */
+  width: 100%; /* Đặt chiều rộng 100% để hình ảnh không bị nhỏ lại */
   height: 100%; /* Chiều cao luôn là 100% để chiếm đầy chiều cao của item */
   object-fit: cover; /* Cover để giữ nguyên tỷ lệ nhưng cắt bớt nếu cần */
   transform: translate(-50%, -50%); /* Đưa hình ảnh về giữa */

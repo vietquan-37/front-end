@@ -9,6 +9,7 @@ import DeleteModal from "./DeleteModal";
 import axios from "axios";
 import ImageGalleryModal from "@/app/admin/products/ViewImage";
 import { GET } from "@/app/api/auth/[...nextauth]/route";
+import { data } from "autoprefixer";
 interface Product {
   id: number;
   "name-product": string;
@@ -36,6 +37,11 @@ const categoryNames: { [key: number]: string } = {
   9: "Ginrin",
   10: "Showa",
 };
+interface ImageResponse {
+  id: number; // Hoặc kiểu dữ liệu phù hợp với API
+  "image-url": string; // Thay đổi theo dữ liệu trả về
+  koiId: number; // Thay đổi nếu cần
+}
 
 export default function Products() 
 {
@@ -61,16 +67,23 @@ const [loading, setLoading] = useState(false);
 const fetchImages = async (koiId: number) => {
   try {
     const response = await fetch(`${process.env.NEXT_PUBLIC_API}/api/koi/${koiId}/images`, {
-      method: GET,
+      method: "GET",
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`,
       },
     });
-    const result = await response.json();
     if (response.ok) {
-      setSelectedImages(result.data); // Cập nhật state với danh sách ảnh
+      const data = await response.json();
+  console.log("Fetched images:", data); // Kiểm tra dữ liệu trả về
+  setSelectedImages(data.data.map((img : ImageResponse) => ({
+    id: img.id, // Giả sử bạn có id ở đây
+    imageUrl: img["image-url"], // Sử dụng đúng khóa
+    koiId: img.koiId, // Nếu có, thay đổi tùy theo dữ liệu trả về
+  }))); // Cập nhật state với danh sách ảnh
     } else {
-      console.error("Lỗi khi lấy danh sách ảnh:", result);
+      const errorData = await response.json(); // Lấy dữ liệu lỗi nếu cần
+  console.error("Lỗi khi lấy danh sách ảnh:", errorData);
+  return;
     }
   } catch (error) {
     console.error("Fetch error:", error);
@@ -80,8 +93,7 @@ const fetchImages = async (koiId: number) => {
 };
 const handleShowImageModal = (koiId: number) => {
   setSelectedKoiId(koiId);
-  fetchImages(koiId); // Gọi hàm fetchImages để lấy ảnh khi mở modal
-  setShowImageModal(true);
+  fetchImages(koiId).then(() => setShowImageModal(true));
 };
 const handleOpenDeleteModal = (product: Product) => {
   setProductToDelete(product);
@@ -287,7 +299,7 @@ return (
                 <span className="flex justify-center">
                 <button className="view button" onClick={() => handleShowImageModal(product.id)}>
                 View Image</button></span>
-
+                
              {/* Thêm nút Details, Update, Delete */}
 <span className="flex justify-center space-x-1">
   <button 

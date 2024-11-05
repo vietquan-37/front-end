@@ -3,7 +3,7 @@ import "@/app/admin/style/viewimage.css";
 
 interface Image {
   id: number;
-  imageUrl: string;
+  imageUrl: string; 
   koiId: number;
 }
 
@@ -16,7 +16,14 @@ interface ImageModalProps {
 
 const ImageModal: React.FC<ImageModalProps> = ({ show, onClose, images ,koiId }) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [imageList, setImageList] = useState<Image[]>(images);
 
+  useEffect(() => {
+    if (images) {
+      setImageList(images);
+    }
+  }, [images]);
+  
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
       setSelectedFile(event.target.files[0]);
@@ -61,16 +68,23 @@ const ImageModal: React.FC<ImageModalProps> = ({ show, onClose, images ,koiId })
         <div className="modal-body">
           <button className="modal-exit" onClick={onClose}>Exit</button>
           <div className="modal-image-grid">
-            {images.length > 0 ? (
-              images.map((image) => (
-                <div key={image.id} className="modal-image-item">
-                  <img src={image.imageUrl} alt="Hình ảnh sản phẩm" />
-                </div>
-              ))
-            ) : (
-              <div className="flex items-center justify-center text-gray-400">No Image</div>
-            )}
-          </div>
+          {images.length > 0 ? (
+  images.map((image) => {
+    console.log("Fetched image object:", image); // Log toàn bộ đối tượng
+    console.log("Fetched image id:", image.id); 
+    console.log("Fetched image URL:", image.imageUrl); // Kiểm tra giá trị URL
+    return (
+      <div key={image.id} className="modal-image-item">
+        <img src={image.imageUrl} alt="Hình ảnh sản phẩm" style={{ maxWidth: '100%', height: 'auto' }} />
+      </div>
+    );
+  })
+) : (
+  <div className="flex items-center justify-center text-gray-400">No Image</div>
+)}
+
+</div>
+
           <input type="file" id="fileInput" onChange={handleFileChange} className="modal-file-input mt-4" />
           <button onClick={handleUploadImage} className="modal-upload-button mt-2">
             Thêm ảnh
