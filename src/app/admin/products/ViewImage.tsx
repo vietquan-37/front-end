@@ -1,135 +1,141 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import "@/app/admin/style/viewimage.css";
+
+interface Image {
+  id: number;
+  imageUrl: string; 
+  koiId: number;
+}
 
 interface ImageModalProps {
   show: boolean;
   onClose: () => void;
-  images: string[];
-  koiId:number | null;
+  images: Image[];
+  koiId: number | null;
 }
 
-const ImageModal: React.FC<ImageModalProps> = ({ show, onClose, images,koiId, }) => {
+const ImageModal: React.FC<ImageModalProps> = ({ show, onClose, images ,koiId }) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [selectedImageId, setSelectedImageId] = useState<number | null>(null);
+  const [imageList, setImageList] = useState<Image[]>(images);
+  const [selectedImage, setSelectedImage] = useState<Image | null>(null); // State lưu ID hình ảnh đã chọn
 
-    // Hàm xử lý khi chọn file
-    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-      if (event.target.files && event.target.files.length > 0) {
-        setSelectedFile(event.target.files[0]);
-      }
-    };
+  const handleImageClick = (image: Image) => {
+    console.log("Image clicked:", image.id);
+    setSelectedImage(image); // Lưu đối tượng Image vào state
+  };
 
-    const handleUploadImage = async () => {
-      if (!koiId) return alert("Không có KoiId."); // Kiểm tra KoiId
-  
-      // Kiểm tra các điều kiện
-      if (selectedImageId !== null && !selectedFile) {
-        console.log("Chưa chọn file mới để cập nhật ảnh." + selectedFile, selectedImageId); // Log thông báo nếu có ảnh nhưng chưa chọn file mới
-          return alert("Chưa chọn file mới để cập nhật ảnh."); // Nếu có ảnh nhưng chưa chọn file mới
-      }
-  
-      if (selectedImageId === null && !selectedFile) {
-        console.log("Chưa chọn file để upload."+ selectedFile, selectedImageId); // Log thông báo nếu không có ảnh và không có file
-          return alert("Chưa chọn file để upload."); // Nếu không có ảnh và không có file
-      }
-  
-      // Khởi tạo FormData
-      const formData = new FormData();
-  
-      // Chỉ thêm file vào formData nếu đã chọn file
-      if (selectedFile) {
-          formData.append("files", selectedFile); // Thêm file vào FormData
-      }
+  useEffect(() => {
+    if (images) {
+      setImageList(images);
+    }
+  }, [images]);
+
+  const handleDeleteImage = async () => {
+    if (selectedImage?.id === null) return; // Không có ID nào được chọn
     try {
-      let response;
-     
-    if (selectedImageId === null) {
-      // Kịch bản 1: Nếu chưa chọn ảnh nào, thêm mới ảnh
-      response = await fetch(`${process.env.NEXT_PUBLIC_API}/api/KOIImage/${koiId}/images`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API}/api/KOIImage/${selectedImage?.id}`, {
+        method: "DELETE",
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+  
+      if (response.status == 200) {
+        alert("Hình ảnh đã được xóa thành công!");
+        // Cập nhật lại danh sách hình ảnh sau khi xóa
+        setImageList((prevImages) => prevImages.filter(image => image.id !== selectedImage?.id));
+        setSelectedImage(null); 
+      } else {
+        alert("Lỗi khi xóa hình ảnh!");
+      }
+    } catch (error) {
+      console.error("Error deleting image:", error);
+      alert("Lỗi khi xóa hình ảnh!");
+    }
+  };
+  
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files.length > 0) {
+      setSelectedFile(event.target.files[0]);
+    }
+  };
+
+  const handleUploadImage = async () => {
+    if (!koiId || !selectedFile) return alert("Chưa chọn file hoặc không có Koi.");
+    const formData = new FormData();
+    formData.append("files", selectedFile);
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API}/api/KOIImage/${koiId}/images`, {
         method: "POST",
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
         body: formData,
       });
-    } else {
-      // Kịch bản 2: Nếu đã chọn ảnh, cập nhật ảnh đã chọn
-      response = await fetch(`${process.env.NEXT_PUBLIC_API}/api/KOIImage/${koiId}/images/${selectedImageId}`, {
-        method: "PUT",
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: formData,
-      });
-    }
-       // Kiểm tra phản hồi
-  if (!response.ok) {
-    const errorData = await response.json(); // Chắc chắn server trả về lỗi dạng JSON
-    console.error("Error details:", errorData); // Log chi tiết lỗi từ server
-    alert("Lỗi khi upload ảnh: " + (errorData.message || "Không rõ lỗi!"));
-    return; // Thoát hàm nếu có lỗi
-  }
-
-  const result = await response.json();
-  alert(selectedImageId === null ? "Ảnh đã được thêm thành công!" : "Ảnh đã được cập nhật thành công!");
-  onClose(); // Đóng modal sau khi upload thành công
-} catch (error) {
-  console.error("Upload error:", error);
-  alert("Có lỗi xảy ra trong quá trình upload.");
-}
-  };
-
-  const handleImageClick = (index: number) => {
-    if (images[index]) {
-      setSelectedImageId(index); // Ghi nhận chỉ số của ảnh đã chọn
-    } else {
-      alert("Không có ảnh để cập nhật.");
+      if (response.ok) {
+        const result = await response.json();
+        alert("Ảnh đã được upload thành công!");
+        const newImageUrl = result.data; 
+        onClose(); // Đóng modal sau khi upload
+      } else {
+        alert("Lỗi khi upload ảnh!");
+      }
+    } catch (error) {
+      console.error("Upload error:", error);
+      alert("Lỗi khi upload ảnh!");
     }
   };
-  const handleCancelUpdate = () => {
-    setSelectedImageId(null);
-    setSelectedFile(null);
-  };
+
   if (!show) return null;
+
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70">
-    <div className="modal-container">
-      <button className="close-button" onClick={onClose}>
-        &times;
-      </button>
-      <h2 className="modal-header">Hình ảnh sản phẩm</h2>
-      <div className="modal-content">
-      <button className="self-end mb-2" onClick={onClose}>Exit</button>
-        <div className="image-grid">
-          {[...Array(4)].map((_, index) => (
-            <div key={index} className="image-item" onClick={() => handleImageClick(index)}>
-              {images[index] ? (
-                <img src={images[index]} alt={`Hình ảnh ${index + 1}`} />
-              ) : (
-                <div className="flex items-center justify-center text-gray-400">No Image</div>
-              )}
-            </div>
-          ))}
-        </div>
-        <input type="file" id="fileInput" onChange={handleFileChange} className="mt-4" />
-          {selectedImageId !== null ? (
+      <div className="modal-view">
+        <button className="modal-close" onClick={onClose}>
+          &times;
+        </button>
+        <h2 className="modal-title">Hình ảnh sản phẩm</h2>
+        <div className="modal-body">
+          <button className="modal-exit" onClick={onClose}>Exit</button>
+          <div className="modal-image-grid">
+          {images.length > 0 ? (
+  images.map((image) => {
+    // console.log("Fetched image object:", image); // Log toàn bộ đối tượng
+    // console.log("Fetched image id:", image.id); 
+    // console.log("Fetched image URL:", image.imageUrl); // Kiểm tra giá trị URL
+    return (
+      <div key={image.id} className="modal-image-item">
+        <img src={image.imageUrl} alt="Hình ảnh sản phẩm" style={{ maxWidth: '100%', height: '100%' }}
+        onClick={() => handleImageClick(image)} />
+      
+      </div>
+    );
+  })
+) : (
+  <div className="flex items-center justify-center text-gray-400">No Image</div>
+)}
+</div>
+
+          {!selectedImage?.id && (
             <>
-              <button onClick={handleUploadImage} className="upload-button mt-2">
-                Cập nhật ảnh
-              </button>
-              <button onClick={handleCancelUpdate} className="cancel-button mt-2">
-                Hủy
+              <input type="file" id="fileInput" onChange={handleFileChange} className="modal-file-input mt-4" />
+              <button onClick={handleUploadImage} className="modal-upload-button mt-2">
+                Thêm ảnh
               </button>
             </>
-          ) : (
-            <button onClick={handleUploadImage} className="upload-button mt-2">
-              Thêm ảnh
-            </button>
           )}
+          
+          {selectedImage?.id && (
+            <div className="delete-confirmation">
+              <p>Bạn có chắc chắn muốn xóa hình ảnh này?</p>
+              <button onClick={handleDeleteImage} className="delete-button">Xóa</button>
+              <button onClick={() => setSelectedImage(null)} className="cancel-button">Hủy</button>
+            </div>
+          )}
+        </div>
       </div>
-      
     </div>
-  </div>
   );
 };
+
 export default ImageModal;

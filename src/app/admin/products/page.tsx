@@ -3,11 +3,13 @@ import Layout from "@/app/admin/layoutAdmin";
 import "@/app/admin/style/ellipsis.css";
 import React, { useEffect, useState } from "react";
 import Modal from "@/app/admin/products/Modal";
-import ImageModal  from "@/app/admin/products/ViewImage"; // Import modal mới
 import UpdateModal from "@/app/admin/products/UpdateModal"; // Import UpdateModal
 import { useRouter } from "next/router"; // Import useRouter
 import DeleteModal from "./DeleteModal";
 import axios from "axios";
+import ImageGalleryModal from "@/app/admin/products/ViewImage";
+import { GET } from "@/app/api/auth/[...nextauth]/route";
+import { data } from "autoprefixer";
 interface Product {
   id: number;
   "name-product": string;
@@ -35,6 +37,11 @@ const categoryNames: { [key: number]: string } = {
   9: "Ginrin",
   10: "Showa",
 };
+interface ImageResponse {
+  id: number; // Hoặc kiểu dữ liệu phù hợp với API
+  "image-url": string; // Thay đổi theo dữ liệu trả về
+  koiId: number; // Thay đổi nếu cần
+}
 
 export default function Products() 
 {
@@ -50,13 +57,44 @@ export default function Products()
   const [productToDelete, setProductToDelete] = useState<Product | null>(null);
   // Bổ sung state để quản lý modal hình ảnh
 const [showImageModal, setShowImageModal] = useState(false);
-const [selectedImages, setSelectedImages] = useState<string[]>([]); // Danh sách ảnh đã chọn
+const [selectedImages, setSelectedImages] = useState<any[]>([]); // Danh sách ảnh đã chọn
 const [selectedKoiId, setSelectedKoiId] = useState<number | null>(null); // Khai báo state cho koiId
 // State cho modal cập nhật
 const [showUpdateModal, setShowUpdateModal] = useState(false);
 const [selectedProduct, setSelectedProduct] = useState<Product | undefined>(undefined);  
+const [loading, setLoading] = useState(false);
 
-
+const fetchImages = async (koiId: number) => {
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API}/api/koi/${koiId}/images`, {
+      method: "GET",
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      },
+    });
+    if (response.ok) {
+      const data = await response.json();
+  console.log("Fetched images:", data); // Kiểm tra dữ liệu trả về
+  setSelectedImages(data.data.map((img : ImageResponse) => ({
+    id: img.id, // Giả sử bạn có id ở đây
+    imageUrl: img["image-url"], // Sử dụng đúng khóa
+    koiId: img.koiId, // Nếu có, thay đổi tùy theo dữ liệu trả về
+  }))); // Cập nhật state với danh sách ảnh
+    } else {
+      const errorData = await response.json(); // Lấy dữ liệu lỗi nếu cần
+  console.error("Lỗi khi lấy danh sách ảnh:", errorData);
+  return;
+    }
+  } catch (error) {
+    console.error("Fetch error:", error);
+  }finally {
+    setLoading(false);
+  }
+};
+const handleShowImageModal = (koiId: number) => {
+  setSelectedKoiId(koiId);
+  fetchImages(koiId).then(() => setShowImageModal(true));
+};
 const handleOpenDeleteModal = (product: Product) => {
   setProductToDelete(product);
   setShowDeleteModal(true);
@@ -259,9 +297,9 @@ return (
                 <span className="ellipsis">{categoryNames[product["category-id"]] || "N/A"}</span>
                 <span className="ellipsis">{product.size} cm</span>
                 <span className="flex justify-center">
-                <button className="view button" onClick={() => handleViewImages(product["image-urls"], product.id)}>
+                <button className="view button" onClick={() => handleShowImageModal(product.id)}>
                 View Image</button></span>
-
+                
              {/* Thêm nút Details, Update, Delete */}
 <span className="flex justify-center space-x-1">
   <button 
@@ -324,13 +362,12 @@ return (
           productName={productToDelete["name-product"]}
         />
       )}
-
-    <ImageModal 
-  show={showImageModal}
-  onClose={() => setShowImageModal(false)}
-  images={selectedImages}   
-  koiId={selectedKoiId}
-/>
+<ImageGalleryModal
+        show={showImageModal}
+        onClose={() => setShowImageModal(false)}
+        images={selectedImages}
+        koiId={selectedKoiId}
+      />
     {/* Hiển thị modal */}
     <Modal 
         show={showModal}

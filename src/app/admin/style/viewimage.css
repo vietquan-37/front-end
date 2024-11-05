@@ -1,4 +1,4 @@
-.modal-container {
+.modal-view {
   display: flex;
   flex-direction: column;
   justify-content: flex-start; /* Đặt nội dung ở phía trên */
@@ -6,21 +6,21 @@
   width: 80%; /* Tăng chiều rộng modal */
   max-width: 800px; /* Thay đổi kích thước tối đa để xử lý kích thước lớn hơn */
   height: auto; /* Để chiều cao tự động dựa trên nội dung */
-  max-height: 80%; /* Để điều chỉnh chiều cao tối đa theo nhu cầu */
+  max-height: 90%; /* Tăng chiều cao tối đa để tránh chạm vào cạnh trên và dưới màn hình */
   padding: 20px;
   background-color: white;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Thay đổi độ sâu bóng */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   overflow-y: auto; /* Thêm cuộn dọc nếu nội dung vượt quá chiều cao */
 }
 
-.modal-header {
-  font-size: 1.8rem; /* Thay đổi kích thước tiêu đề để dễ nhìn hơn */
-  margin-bottom: 20px; /* Tăng khoảng cách dưới tiêu đề */
+.modal-title {
+  font-size: 1.8rem;
+  margin-bottom: 20px;
   text-align: center;
 }
 
-.modal-content {
+.modal-body {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -28,14 +28,14 @@
   width: 100%;
 }
 
-.image-grid {
+.modal-image-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr); /* Thay đổi thành 3 cột cho nhiều hình ảnh hơn */
   gap: 15px; /* Điều chỉnh khoảng cách giữa các hình ảnh */
   width: 100%;
 }
 
-.image-item {
+.modal-image-item {
   position: relative;
   height: 300px; /* Thiết lập chiều cao cho item hình ảnh */
   overflow: hidden; /* Ẩn các phần hình ảnh tràn ra ngoài */
@@ -43,36 +43,38 @@
   border: 2px solid #ddd;
 }
 
-.image-item img {
+.modal-image-item img {
   position: absolute;
   top: 50%; /* Đặt ở giữa theo chiều dọc */
   left: 50%; /* Đặt ở giữa theo chiều ngang */
-  width: auto; /* Để chiều rộng tự động */
+  width: 100%; /* Đặt chiều rộng 100% để hình ảnh không bị nhỏ lại */
   height: 100%; /* Chiều cao luôn là 100% để chiếm đầy chiều cao của item */
   object-fit: cover; /* Cover để giữ nguyên tỷ lệ nhưng cắt bớt nếu cần */
   transform: translate(-50%, -50%); /* Đưa hình ảnh về giữa */
   transition: transform 0.3s ease; /* Thêm hiệu ứng khi hover */
 }
 
-.image-item:hover img {
+.modal-image-item:hover img {
   transform: translate(-50%, -50%) scale(1.05); /* Zoom nhẹ khi hover để tăng tương tác */
 }
 
-.upload-button {
-  background-color: #007bff;
+.modal-upload-button,
+.modal-cancel-button {
+  background-color: #28a745; 
   color: white;
-  padding: 10px 20px; /* Thay đổi kích thước nút để nhìn dễ hơn */
+  padding: 10px 20px;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
 
-.upload-button:hover {
+.modal-upload-button:hover,
+.modal-cancel-button:hover {
   background-color: #0056b3; /* Tối tối màu khi hover */
 }
 
-.close-button {
+.modal-close {
   position: absolute;
   top: 10px;
   right: 10px;
@@ -81,22 +83,8 @@
   font-size: 1.5rem; /* Tăng kích thước chữ cho rõ ràng hơn */
   cursor: pointer;
 }
-.update {
-  background-color: #ffc107; /* Màu vàng */
-  color: white;
-  padding: 8px 12px; /* Kích thước lớn hơn cho nút */
-  border: none;
-  border-radius: 5px; /* Đường cong mềm mại hơn */
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.3s ease; /* Hiệu ứng chuyển đổi */
-}
 
-.update:hover {
-  background-color: #e0a800; /* Màu tối hơn khi hover */
-  transform: scale(1.05); /* Tăng kích thước nhẹ khi hover */
-}
-
-.delete {
+.modal-exit {
   background-color: #dc3545; /* Màu đỏ */
   color: white;
   padding: 8px 12px; /* Kích thước lớn hơn cho nút */
@@ -106,7 +94,48 @@
   transition: background-color 0.3s ease, transform 0.3s ease; /* Hiệu ứng chuyển đổi */
 }
 
-.delete:hover {
+.modal-exit:hover {
   background-color: #c82333; /* Màu tối hơn khi hover */
   transform: scale(1.05); /* Tăng kích thước nhẹ khi hover */
+}
+.delete-confirmation {
+  margin-top: 16px; /* Khoảng cách phía trên */
+  padding: 10px;
+  background-color: #f8d7da; /* Màu nền cho xác nhận xóa */
+  border: 1px solid #f5c6cb; /* Viền cho khung xác nhận */
+  border-radius: 4px; /* Bo tròn các góc */
+}
+
+.delete-confirmation p {
+  margin: 0; /* Xóa margin cho đoạn văn */
+  color: #721c24; /* Màu chữ cho thông báo */
+}
+
+.delete-button {
+  background-color: #dc3545; /* Màu nền cho nút xóa (đỏ) */
+  color: white; /* Màu chữ trắng */
+  border: none; /* Bỏ viền */
+  padding: 8px 12px; /* Padding cho nút */
+  border-radius: 4px; /* Bo tròn các góc */
+  cursor: pointer; /* Đổi con trỏ khi hover */
+  transition: background-color 0.3s; /* Hiệu ứng chuyển màu khi hover */
+}
+
+.delete-button:hover {
+  background-color: #c82333; /* Màu nền khi hover */
+}
+
+.cancel-button {
+  background-color: #6c757d; /* Màu nền cho nút hủy (xám) */
+  color: white; /* Màu chữ trắng */
+  border: none; /* Bỏ viền */
+  padding: 8px 12px; /* Padding cho nút */
+  border-radius: 4px; /* Bo tròn các góc */
+  margin-left: 8px; /* Khoảng cách giữa hai nút */
+  cursor: pointer; /* Đổi con trỏ khi hover */
+  transition: background-color 0.3s; /* Hiệu ứng chuyển màu khi hover */
+}
+
+.cancel-button:hover {
+  background-color: #5a6268; /* Màu nền khi hover */
 }
