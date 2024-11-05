@@ -6,6 +6,8 @@ import Modal from "@/app/admin/products/Modal";
 import ImageModal  from "@/app/admin/products/ViewImage"; // Import modal mới
 import UpdateModal from "@/app/admin/products/UpdateModal"; // Import UpdateModal
 import { useRouter } from "next/router"; // Import useRouter
+import DeleteModal from "./DeleteModal";
+import axios from "axios";
 interface Product {
   id: number;
   "name-product": string;
@@ -43,6 +45,9 @@ export default function Products()
   const [pageSize, setPageSize] = useState(5);
   const [sort, setSort] = useState(""); // Default sort
   const [showModal, setShowModal] = useState(false);
+  // ... các state và hàm đã có sẵn
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [productToDelete, setProductToDelete] = useState<Product | null>(null);
   // Bổ sung state để quản lý modal hình ảnh
 const [showImageModal, setShowImageModal] = useState(false);
 const [selectedImages, setSelectedImages] = useState<string[]>([]); // Danh sách ảnh đã chọn
@@ -50,7 +55,63 @@ const [selectedKoiId, setSelectedKoiId] = useState<number | null>(null); // Khai
 // State cho modal cập nhật
 const [showUpdateModal, setShowUpdateModal] = useState(false);
 const [selectedProduct, setSelectedProduct] = useState<Product | undefined>(undefined);  
+
+
+const handleOpenDeleteModal = (product: Product) => {
+  setProductToDelete(product);
+  setShowDeleteModal(true);
+};
+const handleDeleteProduct = async () => {
+  if (productToDelete) {
+    setShowDeleteModal(true); // Đặt trạng thái deleting
+    console.log("Sản phẩm đang xóa:", productToDelete.id);
+    
+    try {
+      const response = await axios.delete(
+        `${process.env.NEXT_PUBLIC_API}/api/koi/${productToDelete.id}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`, // Thêm token vào header
+          }
+        }
+      );
+
+      // Kiểm tra phản hồi từ API
+      if (response.data.success) {
+        console.log("Xóa sản phẩm thành công:", response.data.data);
+        alert("Sản phẩm đã được xóa thành công.");
+        
+        // Refresh the product list
+        fetchProducts(currentPage, pageSize, searchTerm, sort);
+      } else {
+        console.error('Xóa sản phẩm thất bại:', response.data);
+        if (response.data.error) {
+          alert("Xóa sản phẩm thất bại: " + response.data.error);
+        } else if (response.data['error-messages']) {
+          const errorMessages = response.data['error-messages'];
+          for (const key in errorMessages) {
+            if (errorMessages.hasOwnProperty(key)) {
+              const messages = errorMessages[key];
+              messages.forEach((msg: string) => {
+                alert(`${key}: ${msg}`);
+              });
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error deleting product:', error);
+      alert("Có lỗi xảy ra trong quá trình xóa sản phẩm.");
+    } finally {
+      setShowDeleteModal(false); // Đặt trạng thái deleting thành false
+      setShowDeleteModal(false); // Đóng modal xóa
+      setProductToDelete(null); // Reset sản phẩm được xóa
+    }
+  }
+};
+
   //API cGetAllProductAdmin
+
 const fetchProducts = async (page = 1, size = pageSize, searchTerm = "", sort = "") => {
   try {
     const url = new URL(`${process.env.NEXT_PUBLIC_API}/api/koi`);
@@ -202,17 +263,17 @@ return (
                 View Image</button></span>
 
              {/* Thêm nút Details, Update, Delete */}
-<span className="flex justify-center space-x-2">
+<span className="flex justify-center space-x-1">
   <button 
     className="update button" 
     onClick={() => handleOpenUpdateModal(product.id)} // Lấy dữ liệu sản phẩm theo ID
   >Update</button>
-  <button
-    className="delete button"
-    onClick={() => alert(`Delete ${product["name-product"]}`)}
-  >
-    Delete
-  </button>
+   <button
+                  className="delete button"
+                  onClick={() => handleOpenDeleteModal(product)} // Mở modal xóa
+                >
+                  Delete
+                </button>
 </span>
               </li>
             );
@@ -254,6 +315,16 @@ return (
     }} 
   />
 )}
+  {/* Modal xác nhận xóa */}
+  {showDeleteModal && productToDelete && (
+        <DeleteModal
+          show={showDeleteModal}
+          onClose={() => setShowDeleteModal(false)}
+          onDeleteConfirm={handleDeleteProduct}
+          productName={productToDelete["name-product"]}
+        />
+      )}
+
     <ImageModal 
   show={showImageModal}
   onClose={() => setShowImageModal(false)}
