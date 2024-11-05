@@ -1,55 +1,48 @@
-"use client"
-import Image from "next/image"
-import { useState } from "react"
-const images = [
-    {
-        id: 1,
-        url: "https://images.pexels.com/photos/10211121/pexels-photo-10211121.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-    },
-    {
-        id: 2,
-        url: "https://images.pexels.com/photos/12245117/pexels-photo-12245117.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-    },
-    {
-        id: 3,
-        url: "https://images.pexels.com/photos/18487178/pexels-photo-18487178/free-photo-of-n-c-ao-b-i-l-i-ca.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-    },
-    {
-        id: 4,
-        url: "https://images.pexels.com/photos/18336355/pexels-photo-18336355/free-photo-of-trai-cam-ao-b-i-l-i-ca.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load"
-    },
-]
-const ProductImage = () => {
-    const [index, setIndex] = useState(0)
-    return (
-        <div className=''>
-            <div className="h-[500px] relative">
-                <Image src={images[index].url}
-                    alt=""
-                    fill
-                    className="object-cover rounded-md"
-                    sizes="50vw"
-                />
+"use client";
+import Image from "next/image";
+import { useState } from "react";
 
+type ProductImageProps = {
+  images: string[] | undefined;
+};
 
-            </div>
-            <div className="flex justify-between gap-4 mt-8 cursor-pointer">
+const ProductImage: React.FC<ProductImageProps> = ({ images }) => {
+  const [index, setIndex] = useState(0);
 
-                {images.map((img,i) => (
-                    <div className="w-1/4 h-32 relative gap-4 mt-8 " key={img.id} onClick={()=>setIndex(i)}>
-                        <Image src={img.url}
-                            alt=""
-                            fill
-                            className="object-cover rounded-md"
-                            sizes="30vw"
-                        />
-                    </div>
-                ))}
+  if (!images || images.length === 0) {
+    return <div>No images available</div>;
+  }
 
+  return (
+    <div>
+      <div className="h-[500px] w-full relative">
+        <Image 
+          src={images[index]} 
+          alt="" 
+          fill 
+          className="object-contain rounded-md" 
+          sizes="50vw" 
+        />
+      </div>
+      <div className="flex gap-4 mt-8 cursor-pointer justify-center">
+        {images.map((url, i) => (
+          <div 
+            className="w-1/4 h-24 relative" 
+            key={i} 
+            onClick={() => setIndex(i)}
+          >
+            <Image 
+              src={url} 
+              alt="" 
+              fill 
+              className="object-contain rounded-md" 
+              sizes="20vw" 
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
 
-            </div>
-        </div>
-    )
-}
-
-export default ProductImage
+export default ProductImage;

@@ -31,6 +31,7 @@ const LoginPage = () => {
       });   
        // Kiểm tra phản hồi
     if (res?.error) {
+      setIsLoading(false);
       setError("Đăng nhập không thành công.");
     } else {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API}/api/authentication/login`, {
