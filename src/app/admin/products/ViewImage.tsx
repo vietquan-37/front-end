@@ -92,11 +92,11 @@ const ImageModal: React.FC<ImageModalProps> = ({ show, onClose, images ,koiId })
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70">
       <div className="modal-view">
         <button className="modal-close" onClick={onClose}>
-          &times;
+        <button className="modal-exit" onClick={onClose}>Exit</button>
         </button>
         <h2 className="modal-title">Hình ảnh sản phẩm</h2>
         <div className="modal-body">
-          <button className="modal-exit" onClick={onClose}>Exit</button>
+          
           <div className="modal-image-grid">
           {images.length > 0 ? (
   images.map((image) => {
@@ -127,9 +127,9 @@ const ImageModal: React.FC<ImageModalProps> = ({ show, onClose, images ,koiId })
           
           {selectedImage?.id && (
             <div className="delete-confirmation">
-              <p>Bạn có chắc chắn muốn xóa hình ảnh này?</p>
-              <button onClick={handleDeleteImage} className="delete-button">Xóa</button>
-              <button onClick={() => setSelectedImage(null)} className="cancel-button">Hủy</button>
+              <p>U want delete it ?</p>
+              <button onClick={handleDeleteImage} className="delete-button">Delete</button>
+              <button onClick={() => setSelectedImage(null)} className="cancel-button">Cancel</button>
             </div>
           )}
         </div>
