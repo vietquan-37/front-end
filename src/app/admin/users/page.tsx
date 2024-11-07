@@ -143,10 +143,10 @@ export default function Users() {
                 <span>{user.id}</span>
                 <span className="ellipsis">{user["full-name"]}</span>
                 <span className="ellipsis">{user.email}</span>
-                <span className="ellipsis">{user.address || "N/A"}</span>
+                <span className="ellipsis">{user.address || "Not Given"}</span>
                 <span className="ellipsis">{user["telephone-number"]}</span>
                 <span className="ellipsis">{user.status = 1 ? "Active" : "Inactive"}</span>
-                <span className="ellipsis">{user["role-name"] || "N/A"}</span>
+                <span className="ellipsis">{user["role-name"] || "Customer"}</span>
               </li>
             ))
           ) : (
