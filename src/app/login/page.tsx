@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import Link from 'next/link';
 import { useEffect, useState } from "react";
 import { signIn, SignInResponse, useSession } from "next-auth/react";
 import {
@@ -122,9 +123,8 @@ const LoginPage = () => {
         {error && <div className="text-red-600">{error}</div>}
 
         <div className="text-sm underline cursor-pointer">
-          {"Don't"} have an account?
-        </div>
-
+  <Link href="/register">{"Don't"} have an account?</Link>
+</div>
         {message && <div className="text-green-600 text-sm">{message}</div>}
       </form>
     </div>

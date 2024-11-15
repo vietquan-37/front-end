@@ -2,11 +2,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+
 import { useState } from "react";
 import CartModal from "./CartModal";
 import { signOut, useSession } from "next-auth/react";
-import UseAxiosAuth from "@/utils/axiosClient";
+
 
 const NavIcons = () => {
 
@@ -33,7 +33,8 @@ const NavIcons = () => {
                     />
                     {isProfileOpen && (
                         <div className="absolute p-4 rounded-md top-12 left-0 bg-white text-sm shadow-[0_3px_10px_rgb(0,0,0,0.2)] z-20">
-                            <Link href="/user/profile">Profile</Link>
+                          <Link href="/user/profile" className="block mt-2">Profiles</Link>
+                          <Link href="/user/address" className="block mt-2">Address</Link>
                             <Link href="/user/orders" className="block mt-2">Orders</Link>
                             <Link href="/user/reviews" className="block mt-2">Reviews</Link>
                             <button className="mt-2 cursor-pointer bg-transparent" onClick={() => signOut()}>Logout</button>

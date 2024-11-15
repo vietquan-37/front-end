@@ -27,13 +27,12 @@ const RegisterPage = () => {
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError("");
+    setError(""); // Reset error before making the request
     setIsLoading(true);
   
     try {
       const response = await http.post("/api/authentication/register", formData);
   
-      // Assuming response.data is the structure from the API response
       const { success, message, error } = response.data;
   
       if (success) {
@@ -43,14 +42,16 @@ const RegisterPage = () => {
           router.push("/login");
         }, 3000);
       } else {
-        setError(error);
+        setError(error || "An unknown error occurred. Please try again.");
       }
     } catch (err: any) {
-      setError(err?.message || "An error occurred.");
+      // Display the error message from the server or a generic message if no specific error is provided
+      setError(err?.response?.data?.message || err?.message || "An error occurred. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
+  
   
   return (
     <div className="h-[calc(100vh-80px)] px-4 md:px-8 lg:px-16 xl:px-32 2xl:px-64 flex items-center justify-center">

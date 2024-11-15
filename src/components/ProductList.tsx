@@ -5,12 +5,13 @@ import Link from "next/link";
 import { useState } from "react";
 
 type Product = {
-  id: number; // Use id directly
+  id: number;
   "image-urls": string[];
   "name-product": string;
   price: number;
   "description-product": string;
   size: number;
+  quantity: number; // Add quantity to track stock
 };
 
 interface ProductListProps {
@@ -23,39 +24,33 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
   const [loading, setLoading] = useState<{ [key: number]: boolean }>({});
 
   const addToCart = async (product: Product) => {
-    setLoading((prev) => ({ ...prev, [product.id]: true })); // Set loading state to true for this product
+    setLoading((prev) => ({ ...prev, [product.id]: true }));
     try {
-        const response = await axiosAuth.post(`/api/Order/addtocart`, {
-            quantity: 1,
-            "koi-id": product.id,
-        });
+      const response = await axiosAuth.post(`/api/Order/addtocart`, {
+        quantity: 1,
+        "koi-id": product.id,
+      });
 
-        console.log(`Response from server:`, response.data); // Log response for debugging
+      console.log(`Response from server:`, response.data);
 
-        // Adjusted to check for success field directly
-        if (response.data && response.data.success) {
-            alert(`Product ${product["name-product"]} added to cart!`);
-            setError((prev) => ({ ...prev, [product.id]: null })); // Clear any previous error
-        } else {
-            // Handle failure case when success is false or undefined
-            const errorMessage = response.data?.message || "Product are already in cart"; // Fallback message
-            alert(`Failed to add to cart: ${errorMessage}`); // Alert with the server's message
-            setError((prev) => ({ ...prev, [product.id]: errorMessage })); // Set error from server message
-        }
-    } catch (error: any) {
-        console.error(`Failed to add product ${product.id} to cart:`, error);
-        // Handle unexpected errors without a hardcoded message
-        const errorMessage = error.response?.data?.message || "An unexpected error occurred.";
-        alert(`Error: ${errorMessage}`); // Alert for unexpected errors
+      if (response.data && response.data.success) {
+        alert(`Product ${product["name-product"]} added to cart!`);
+        setError((prev) => ({ ...prev, [product.id]: null }));
+      } else {
+        const errorMessage = response.data?.message || "Product is already in cart";
+        alert(`Failed to add to cart: ${errorMessage}`);
         setError((prev) => ({ ...prev, [product.id]: errorMessage }));
+      }
+    } catch (error: any) {
+      console.error(`Failed to add product ${product.id} to cart:`, error);
+      const errorMessage = error.response?.data?.message || "An unexpected error occurred.";
+      alert(`Error: ${errorMessage}`);
+      setError((prev) => ({ ...prev, [product.id]: errorMessage }));
     } finally {
-        setLoading((prev) => ({ ...prev, [product.id]: false })); // Reset loading state
+      setLoading((prev) => ({ ...prev, [product.id]: false }));
     }
-};
+  };
 
-
-  
-  
   return (
     <div className="mt-12 flex gap-x-8 gap-y-16 justify-between flex-wrap">
       {products.map((product) => (
@@ -79,12 +74,15 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
           <div className="flex justify-between items-center">
             <div>
               <span className="font-semibold">{product["name-product"]}</span>
-              <span className="font-medium ml-2">{product.price} VNĐ</span>
+              <span className="font-medium ml-2">
+  {product.price.toLocaleString("vi-VN", { style: "currency", currency: "VND" })}
+</span>
+
             </div>
             <button
-              className="rounded-2xl ring-1 ring-quan text-quan py-2 px-4 text-xs hover:bg-quan hover:text-white flex items-center justify-center w-24" // Set fixed width
+              className="rounded-2xl ring-1 ring-quan text-quan py-2 px-4 text-xs hover:bg-quan hover:text-white flex items-center justify-center w-24"
               onClick={() => addToCart(product)}
-              disabled={loading[product.id]} // Disable button when loading
+              disabled={loading[product.id] || product.quantity === 0} // Disable if loading or quantity is 0
             >
               {loading[product.id] ? (
                 <span className="animate-spin h-4 w-4 border-t-2 border-quan border-opacity-50 rounded-full"></span>
@@ -95,7 +93,7 @@ const ProductList: React.FC<ProductListProps> = ({ products }) => {
           </div>
           <div className="text-sm text-gray-500">{product["description-product"]}</div>
           <div className="text-sm text-gray-500">Size: {product.size} cm</div>
-          {error[product.id] && <p className="text-red-500 text-xs">{error[product.id]}</p>} {/* Display error if exists */}
+          {error[product.id] && <p className="text-red-500 text-xs">{error[product.id]}</p>}
         </div>
       ))}
     </div>
